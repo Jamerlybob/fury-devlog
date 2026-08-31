@@ -35,7 +35,7 @@ params:
   profileMode:
     enabled: true
     title: "Reviving Fury"
-    subtitle: "Reverse-engineering a dead 2007 MMO, one broken packet at a time. Following along as I decompile, rebuild, and document the whole process — successes and failures included."
+    subtitle: "Reverse-engineering a dead 2007 MMO, one broken packet at a time.
     imageUrl: ""
     buttons:
       - name: Posts

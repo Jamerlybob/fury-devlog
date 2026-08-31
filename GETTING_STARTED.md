@@ -92,13 +92,18 @@ That push is what triggers the auto-deploy — a minute or two later, the live s
 
 From inside the `fury-devlog` folder:
 ```bash
-hugo new content posts/decompiling-goskills.md
+hugo new content posts/decompiling-goskills/index.md
 ```
-(Pick your own filename — lowercase, hyphens instead of spaces, no spaces or special characters.)
+Note the `/index.md` at the end — this creates a **page bundle**: a folder
+(`decompiling-goskills/`) with your post inside as `index.md`. Any images or
+gifs for that post live in the *same folder*, right next to it. This matters
+a lot if you're writing in Obsidian — see the Obsidian section below.
+
+(Pick your own folder name — lowercase, hyphens instead of spaces, no spaces or special characters.)
 
 This creates the file pre-filled with the template structure (Where I left off / What I tried / What broke / What I learned / Next up) and `draft: true` at the top.
 
-Open it in any text editor (VS Code is a good free one) and write.
+Open it in any text editor (VS Code is a good free one) — or Obsidian, see below — and write.
 
 **When you're ready to publish**, change `draft: true` to `draft: false` at the top of the file. Draft posts never get built into the live site, so you can write in progress without anyone seeing it.
 
@@ -159,19 +164,58 @@ public class Example { }
 
 ### Adding images and gifs
 
-1. **Where to put the file**: create a folder per post inside `static/images/`, e.g. `static/images/decompiling-goskills/`, and drop your image or gif in there. Keeping one folder per post stops things getting messy as you add more.
+Because posts are now page bundles (a folder per post), images just live
+**in the same folder as the post itself** — no separate images folder to
+manage, no long paths to type.
 
-2. **Reference it in the post** like this:
+1. Drop your image or gif directly into the post's folder, e.g.
+   `content/posts/decompiling-goskills/class-tree.png`
+
+2. Reference it in the post with just the filename:
    ```markdown
-   ![Screenshot of UE Explorer showing the GOSkills class tree](/images/decompiling-goskills/class-tree.png)
+   ![Screenshot of UE Explorer showing the GOSkills class tree](class-tree.png)
    ```
-   The bit in `[square brackets]` is **alt text** — a short description of what's in the image. Always write a real one (not just "screenshot") — it matters for accessibility and it's what shows if the image fails to load.
+   No `/images/...` path needed — since the image sits right next to the
+   post, a bare filename is all Hugo needs.
 
 3. **Gifs work exactly the same way** — just reference the `.gif` file the same as a `.png` or `.jpg`. No special syntax needed.
 
 4. **File size tip**: compress before uploading, especially gifs (they get huge fast). Free tools: [tinypng.com](https://tinypng.com) for images, [ezgif.com](https://ezgif.com) for gifs. Aim to keep individual files under a couple MB so the site stays fast to load.
 
 5. **Recording gifs**: [ScreenToGif](https://www.screentogif.com/) (Windows, free) is the easiest way to record a short clip and export straight to `.gif`. For longer clips, record with **OBS Studio** as an `.mp4` first, then convert the interesting few seconds with ezgif.com.
+
+---
+
+## Part 3: Writing in Obsidian (optional, but recommended)
+
+Obsidian writes plain markdown files, and Hugo reads plain markdown files —
+they work well together with a couple of one-time settings changes.
+
+### One-time Obsidian setup
+
+1. **Open the whole `fury-devlog` folder as an Obsidian vault** (Obsidian → "Open folder as vault" → pick `fury-devlog`). This gives you the whole project in Obsidian's file browser, not just a "posts" folder floating on its own.
+
+2. **Turn off Wikilinks**, so Obsidian writes normal markdown links (which Hugo understands) instead of Obsidian's own `[[double-bracket]]` style:
+   - Settings → Editor → toggle **"Use [[Wikilinks]]"** off
+
+3. **Set the attachment folder to "same folder as current file"**, so anything you paste or drag in lands right next to the post it belongs to (this is what makes the page-bundle structure above pay off):
+   - Settings → Files and Links → **"Default location for new attachments"** → choose **"Same folder as current file"**
+
+4. **Hide the technical folders from cluttering your Obsidian file browser** (theme files, build output, etc. — you'll never edit these):
+   - Settings → Files and Links → **"Excluded files"** → add: `themes`, `public`, `resources`, `.github`
+
+### The actual workflow
+
+- Still use `hugo new content posts/your-slug/index.md` from a terminal to create each new post — this makes sure the frontmatter template (title, date, tags, series) is filled in correctly, which Obsidian alone won't do for you.
+- Then just open that post folder in Obsidian and write. Paste screenshots straight from your clipboard (`Ctrl+V`) — Obsidian saves the file into the same folder automatically and inserts the correct markdown link for you, because of the attachment setting above.
+- Drag-and-drop gifs the same way.
+- When you want to preview it properly (exact fonts, layout, dark mode, etc. — not just Obsidian's own preview), run `hugo server --buildDrafts` in a terminal alongside Obsidian and check `http://localhost:1313/`.
+- Commit and push as normal (`git add -A`, `git commit -m "..."`, `git push`) once you're happy — Obsidian doesn't need to know about Git at all; you can do that from a terminal or a Git GUI like GitHub Desktop if you prefer not to touch the command line for that part.
+
+### A couple of nice extras once this is set up
+
+- **Backlinks/graph view**: if you link between your own posts or to the glossary using standard markdown links (e.g. `[UnrealScript](/glossary/#unrealscript)`), Obsidian will still generally track these for its backlinks panel, so you get a lightweight map of how your posts connect — a nice side benefit of writing in Obsidian over a plain text editor.
+- **Templates**: Obsidian's built-in Templates core plugin can be handy for quick scratch notes (debugging logs, ideas) that *aren't* meant to become posts — keep those outside the `content/` folder entirely (e.g. a `notes/` folder at the project root) so Hugo never tries to build them into pages.
 
 ### General tips
 
