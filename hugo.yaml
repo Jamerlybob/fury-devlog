@@ -1,0 +1,93 @@
+baseURL: "https://jamerlybob.github.io/fury-devlog/"
+languageCode: "en-us"
+title: "Reviving Fury"
+theme: "PaperMod"
+
+pagination:
+  pagerSize: 10
+
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+
+minify:
+  disableXML: true
+
+params:
+  env: production
+  title: "Reviving Fury"
+  description: "Reverse-engineering and reviving a dead 2007 MMO — a dev log."
+  keywords: [Blog, Portfolio, DevLog, UnrealEngine, GameDev]
+  author: "James"
+  defaultTheme: auto
+  disableThemeToggle: false
+  ShowShareButtons: true
+  ShowReadingTime: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: true
+  ShowToc: true
+  comments: false
+
+  profileMode:
+    enabled: true
+    title: "Reviving Fury"
+    subtitle: "Reverse-engineering a dead 2007 MMO, one broken packet at a time. Following along as I decompile, rebuild, and document the whole process — successes and failures included."
+    imageUrl: ""
+    buttons:
+      - name: Posts
+        url: posts
+      - name: Glossary
+        url: glossary
+      - name: GitHub
+        url: "https://github.com/jamerlybob"
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/jamerlybob"
+
+  assets:
+    disableHLJS: true
+
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: 10
+    - identifier: glossary
+      name: Glossary
+      url: /glossary/
+      weight: 20
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 30
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 40
+
+taxonomies:
+  tag: tags
+  series: series
+
+markup:
+  highlight:
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: monokai
