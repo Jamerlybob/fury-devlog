@@ -1,7 +1,7 @@
 ---
 title: "Why I'm Reviving a Dead MMO"
 date: 2026-08-31
-draft: false
+draft: true
 tags: ["fury", "intro", "unreal-engine-3"]
 series: ["Reviving Fury"]
 summary: "Kicking off a project to reverse-engineer and revive Fury, a 2007 MMO that's been dead since 2008."
