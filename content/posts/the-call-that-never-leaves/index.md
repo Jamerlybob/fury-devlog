@@ -167,3 +167,53 @@ Next job is figuring out exactly where in the handoff from server to client
 those two "who's in charge" flags are supposed to flip, and whether my
 server needs to hand them over already flipped instead of trusting the
 client to do it.
+
+## Chasing the flags, and finding something else entirely
+
+So that was the plan. I had a specific, concrete idea of *how* those two
+flags might end up both saying "the server": my earlier reading said the
+client applies a batch of properties one at a time, in a fixed order, and if
+it stops partway through that batch for the controller object specifically,
+it would land on exactly the wrong pair of values by accident. There's a
+single spot in the client's code that would cause exactly that kind of
+partial stop, and this time I could actually watch it happen live instead of
+reading cold disassembly and guessing.
+
+I hooked that one spot, both the check itself and the place execution lands
+if it fires, and ran a full session: server up, client spawned, all four of
+my game objects opened and replicated, right through the loading screen
+drop. Then I watched the hook trace.
+
+It never fired. Not once, on any of the four objects, across their opening
+messages or their follow up updates. Clean theory, wrong theory. That's the
+second dead end this thread has produced, and honestly the more satisfying
+kind: I built the exact instrument needed to catch it red-handed, and it
+came back with a clear no instead of an ambiguous maybe.
+
+But watching that same trace turned up something I wasn't looking for. Three
+of my four game objects (the two scoreboard style ones and my character's
+body) each send exactly the two values I told the server to send for them,
+and the client applies both, cleanly, every time. My player controller, the
+one object at the centre of this whole mystery, sends the same two values
+but the client only ever applies **one** of them. Not "applies the wrong
+one", not "crashes", just quietly stops after the first and moves on to the
+next message like nothing's missing.
+
+That's new, and it's specific to exactly the one object I already suspected.
+It also means my "both flags happen to end up on the wrong values by
+accident" theory can't be the *whole* story either, since the mechanism I
+thought would cause that never runs. Something earlier in the pipeline, the
+part that turns a raw number on the wire into "this is property number 18,
+the Role field" is where I need to look next: whether the number I'm sending
+even survives to that point unchanged for this one particular, unusually
+large object.
+
+## Where this actually leaves things
+
+Two theories down today, not one, and the search area is smaller and
+stranger each time: it's not the loading screen logic, it's not this
+particular truncation check, it's something upstream of both, and it only
+shows up on the one object with the longest family tree of the four. Next
+job: catch the raw number as it comes off the wire for that specific message,
+before anything tries to look up what it means, and see whether it's already
+wrong by the time it gets there.
