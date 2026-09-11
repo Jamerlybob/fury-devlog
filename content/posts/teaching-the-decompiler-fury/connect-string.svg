@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 250" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="250" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">What a Fury client pulls out of its connect string</text>
+  <text x="24" y="50" font-size="11" fill="#9dc4b2">a connect string is a URL with settings tacked on. these five names are straight from the shipped code.</text>
+
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="12" text-anchor="middle">
+    <rect x="24"  y="70" width="120" height="32" rx="4" fill="#14432f" stroke="#5fe0a0"/><text x="84"  y="91">login</text>
+    <rect x="150" y="70" width="120" height="32" rx="4" fill="#14432f" stroke="#5fe0a0"/><text x="210" y="91">acc</text>
+    <rect x="276" y="70" width="120" height="32" rx="4" fill="#14432f" stroke="#5fe0a0"/><text x="336" y="91">pass</text>
+    <rect x="402" y="70" width="130" height="32" rx="4" fill="#14432f" stroke="#5fe0a0"/><text x="467" y="91">realmurl</text>
+    <rect x="538" y="70" width="118" height="32" rx="4" fill="#14432f" stroke="#5fe0a0"/><text x="597" y="91">rsvname</text>
+  </g>
+
+  <g font-size="10.5" fill="#9dc4b2" text-anchor="middle">
+    <text x="84"  y="124">login server</text>
+    <text x="84"  y="138">address</text>
+    <text x="210" y="124">account</text>
+    <text x="210" y="138">name</text>
+    <text x="336" y="124">password</text>
+    <text x="467" y="124">"realm update"</text>
+    <text x="467" y="138">web address</text>
+    <text x="597" y="124">reserved</text>
+    <text x="597" y="138">character name</text>
+  </g>
+
+  <text x="24" y="184" font-size="11" fill="#e6efe8">When I stand up a fake server, this is part of what it has to understand.</text>
+  <text x="24" y="206" font-size="11" fill="#9dc4b2">Now I know what to call each field.</text>
+</svg>

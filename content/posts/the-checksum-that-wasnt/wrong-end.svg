@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 230" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="230" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="28" font-size="14" fill="#5fe0a0">One number, wrong end</text>
+
+  <text x="24" y="62" font-size="12" fill="#f2a5a5">what I kept sending (x40):</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="24" y="72" width="120" height="40" fill="#3a1f1f" stroke="#f2a5a5"/><text x="84" y="97">my guess for d0</text>
+    <rect x="144" y="72" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="199" y="97">GUID.A</text>
+    <rect x="254" y="72" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="309" y="97">GUID.B</text>
+    <rect x="364" y="72" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="419" y="97">GUID.C</text>
+    <rect x="484" y="72" width="110" height="40" fill="none" stroke="#9dc4b2" stroke-dasharray="4 4"/><text x="539" y="97" fill="#9dc4b2">GUID.D</text>
+  </g>
+  <text x="600" y="97" font-size="10.5" fill="#9dc4b2">shoved off</text>
+  <text x="600" y="110" font-size="10.5" fill="#9dc4b2">the end</text>
+
+  <text x="24" y="146" font-size="12" fill="#5fe0a0">what the client wanted:</text>
+  <g font-size="12" text-anchor="middle">
+    <rect x="24" y="156" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="79" y="181">GUID.A</text>
+    <rect x="134" y="156" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="189" y="181">GUID.B</text>
+    <rect x="244" y="156" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="299" y="181">GUID.C</text>
+    <rect x="354" y="156" width="110" height="40" fill="#15402c" stroke="#5fe0a0"/><text x="409" y="181">GUID.D</text>
+    <rect x="464" y="156" width="180" height="40" fill="#3a2e14" stroke="#e0a34f"/><text x="554" y="175">Auran's mystery field</text><text x="554" y="189" font-size="10">(from post 6)</text>
+  </g>
+  <text x="24" y="218" font-size="11.5" fill="#9dc4b2">Five numbers, 40 hex characters either way, so the length check passed every time. Just shifted by one slot.</text>
+</svg>

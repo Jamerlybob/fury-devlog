@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 470" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5fe0a0"/></marker>
+    <marker id="o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e0a34f"/></marker>
+  </defs>
+  <rect width="680" height="470" rx="6" fill="#0b2a1d"/>
+  <text x="110" y="32" font-size="14" text-anchor="middle" fill="#5fe0a0">Fury client (2008)</text>
+  <text x="570" y="32" font-size="14" text-anchor="middle" fill="#e0a34f">my server (C#, 2026)</text>
+  <line x1="110" y1="44" x2="110" y2="400" stroke="#2e5c46" stroke-width="2"/>
+  <line x1="570" y1="44" x2="570" y2="400" stroke="#2e5c46" stroke-width="2"/>
+
+  <g font-size="11.5" font-family="ui-monospace, Consolas, monospace">
+    <line x1="112" y1="80" x2="566" y2="80" stroke="#5fe0a0" stroke-width="1.5" marker-end="url(#g)"/>
+    <text x="340" y="72" text-anchor="middle">HELLO P=1 REVISION=0 MINVER=2327 VER=2797</text>
+
+    <line x1="568" y1="126" x2="114" y2="126" stroke="#e0a34f" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="340" y="118" text-anchor="middle">CHALLENGE NONCE=0 VER=2797 MINVER=2327</text>
+
+    <line x1="112" y1="172" x2="566" y2="172" stroke="#5fe0a0" stroke-width="1.5" marker-end="url(#g)"/>
+    <text x="340" y="158" text-anchor="middle">NETSPEED 15000</text>
+
+    <line x1="112" y1="210" x2="566" y2="210" stroke="#5fe0a0" stroke-width="1.5" marker-end="url(#g)"/>
+    <text x="340" y="202" text-anchor="middle">LOGIN RESPONSE=-1812032818 URL=entry.fmap</text>
+
+    <line x1="568" y1="256" x2="114" y2="256" stroke="#e0a34f" stroke-width="1.5" marker-end="url(#o)"/>
+    <text x="340" y="248" text-anchor="middle">WELCOME LEVEL=EL1_Mortem GAME=GOGame.GOCombatGameEL1</text>
+
+    <line x1="112" y1="302" x2="566" y2="302" stroke="#5fe0a0" stroke-width="1.5" marker-end="url(#g)"/>
+    <text x="340" y="294" text-anchor="middle">CRC File=Core.u Checksum=...   (x11, one per file)</text>
+
+    <line x1="112" y1="348" x2="566" y2="348" stroke="#5fe0a0" stroke-width="1.5" marker-end="url(#g)"/>
+    <text x="340" y="340" text-anchor="middle">JOIN</text>
+  </g>
+
+  <g font-size="10.5" fill="#9dc4b2">
+    <text x="124" y="100">"hi, here's my version"</text>
+    <text x="556" y="146" text-anchor="end">"prove it" (any number works, see below)</text>
+    <text x="124" y="230">"logging in, I'm on the loading level"</text>
+    <text x="556" y="276" text-anchor="end">"go load this arena"</text>
+    <text x="124" y="322">"here are my files' fingerprints"</text>
+    <text x="124" y="368">"ready, put me in"</text>
+  </g>
+
+  <rect x="40" y="410" width="600" height="40" rx="5" fill="none" stroke="#9dc4b2" stroke-dasharray="5 4"/>
+  <text x="340" y="435" font-size="12.5" text-anchor="middle" fill="#9dc4b2">...then the loading screen, forever. It wants a character. I don't have one to give it.</text>
+</svg>

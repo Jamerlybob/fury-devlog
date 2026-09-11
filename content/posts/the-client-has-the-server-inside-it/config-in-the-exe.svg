@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 340" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="340" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">Reading the plain text baked into Fury.exe</text>
+  <text x="24" y="50" font-size="11" fill="#9dc4b2">run `strings` on the client executable and the whole server cluster's config schema falls out</text>
+
+  <!-- the exe -->
+  <rect x="24" y="70" width="632" height="240" rx="5" fill="none" stroke="#9dc4b2"/>
+  <text x="40" y="92" font-size="12" fill="#9dc4b2" font-family="IBM Plex Mono, ui-monospace, monospace">Fury.exe</text>
+
+  <!-- sections found -->
+  <g font-family="IBM Plex Mono, ui-monospace, monospace">
+    <rect x="44" y="108" width="180" height="58" rx="4" fill="#14432f" stroke="#e0a34f"/>
+    <text x="134" y="132" font-size="12" text-anchor="middle" fill="#e0a34f">[MATCHMAKING]</text>
+    <text x="134" y="152" font-size="9.5" text-anchor="middle" fill="#9dc4b2">process name + port</text>
+
+    <rect x="250" y="108" width="180" height="58" rx="4" fill="#14432f" stroke="#e0a34f"/>
+    <text x="340" y="132" font-size="12" text-anchor="middle" fill="#e0a34f">[REALMMASTER]</text>
+    <text x="340" y="152" font-size="9.5" text-anchor="middle" fill="#9dc4b2">process name + port</text>
+
+    <rect x="456" y="108" width="180" height="58" rx="4" fill="#14432f" stroke="#e0a34f"/>
+    <text x="546" y="132" font-size="12" text-anchor="middle" fill="#e0a34f">[BILLING]</text>
+    <text x="546" y="152" font-size="9.5" text-anchor="middle" fill="#9dc4b2">process name + port</text>
+
+    <rect x="44" y="176" width="180" height="58" rx="4" fill="#14432f" stroke="#e0a34f"/>
+    <text x="134" y="200" font-size="12" text-anchor="middle" fill="#e0a34f">[LOGINS]</text>
+    <text x="134" y="220" font-size="9.5" text-anchor="middle" fill="#9dc4b2">process name + port</text>
+
+    <rect x="250" y="176" width="386" height="58" rx="4" fill="none" stroke="#3f9d64" stroke-dasharray="4 3"/>
+    <text x="443" y="200" font-size="11" text-anchor="middle" fill="#e6efe8">server entry point, map editor, database layer</text>
+    <text x="443" y="220" font-size="9.5" text-anchor="middle" fill="#9dc4b2">all compiled into the same binary players downloaded</text>
+  </g>
+
+  <text x="44" y="266" font-size="11" fill="#e6efe8">Section headings, every setting name, port numbers, the name of every server process.</text>
+  <text x="44" y="286" font-size="11" fill="#9dc4b2">This is a public test build. Auran shipped it with the developer plumbing left in.</text>
+</svg>

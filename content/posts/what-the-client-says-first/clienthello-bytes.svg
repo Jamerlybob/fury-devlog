@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 320" font-family="IBM Plex Mono, ui-monospace, monospace" fill="#e6efe8">
+  <rect width="680" height="320" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif">Fury's opening line, read byte by byte</text>
+
+  <!-- byte strip -->
+  <g font-size="13" text-anchor="middle">
+    <rect x="24"  y="52" width="46" height="34" fill="#14432f" stroke="#e0a34f"/><text x="47"  y="74">16</text>
+    <rect x="70"  y="52" width="76" height="34" fill="none" stroke="#5fe0a0"/><text x="108" y="74">03 01</text>
+    <rect x="146" y="52" width="76" height="34" fill="none" stroke="#9dc4b2"/><text x="184" y="74">00 61</text>
+    <rect x="222" y="52" width="46" height="34" fill="#14432f" stroke="#e0a34f"/><text x="245" y="74">01</text>
+    <rect x="268" y="52" width="96" height="34" fill="none" stroke="#9dc4b2"/><text x="316" y="74">00 00 5d</text>
+    <rect x="364" y="52" width="76" height="34" fill="none" stroke="#5fe0a0"/><text x="402" y="74">03 01</text>
+    <rect x="440" y="52" width="116" height="34" fill="none" stroke="#9dc4b2"/><text x="498" y="74">6a 9e a5 68</text>
+    <rect x="556" y="52" width="100" height="34" fill="none" stroke="#9dc4b2" stroke-dasharray="3 3"/><text x="606" y="74">...</text>
+  </g>
+
+  <g font-size="10.5" fill="#9dc4b2" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif">
+    <path d="M47 92 L47 104" stroke="#e0a34f"/><text x="30" y="120" fill="#e0a34f">record type 22:</text><text x="30" y="134" fill="#e0a34f">"handshake"</text>
+    <path d="M108 92 L108 150" stroke="#5fe0a0"/><text x="80" y="166" fill="#5fe0a0">version: TLS 1.0</text>
+    <path d="M184 92 L184 180" stroke="#9dc4b2"/><text x="150" y="196">record length: 97 bytes</text>
+    <path d="M245 92 L245 210" stroke="#e0a34f"/><text x="210" y="226" fill="#e0a34f">handshake type 1: ClientHello</text>
+    <path d="M402 92 L402 240" stroke="#5fe0a0"/><text x="366" y="256" fill="#5fe0a0">client's TLS version, again: 1.0</text>
+    <path d="M498 92 L498 270" stroke="#9dc4b2"/><text x="462" y="286">a timestamp, then 28 random bytes,</text><text x="462" y="300">then the list of cipher styles it offers</text>
+  </g>
+
+  <text x="24" y="52" font-size="1" fill="none">.</text>
+</svg>

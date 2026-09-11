@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 272" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="272" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">Sitting in the middle of a conversation that has no other end</text>
+
+  <!-- launcher -->
+  <rect x="24" y="70" width="170" height="90" rx="5" fill="#14432f" stroke="#5fe0a0"/>
+  <text x="109" y="98" font-size="12" text-anchor="middle" fill="#5fe0a0">Fury launcher</text>
+  <text x="109" y="120" font-size="9.5" text-anchor="middle" fill="#9dc4b2">wants to log in and</text>
+  <text x="109" y="134" font-size="9.5" text-anchor="middle" fill="#9dc4b2">hand the game a</text>
+  <text x="109" y="148" font-size="9.5" text-anchor="middle" fill="#9dc4b2">startup line</text>
+
+  <!-- override -->
+  <text x="340" y="60" font-size="10" text-anchor="middle" fill="#e0a34f">FURY_LOGIN_SERVER = 127.0.0.1</text>
+  <path d="M196 108 L446 108" stroke="#5fe0a0" fill="none" marker-end="url(#w)"/>
+  <text x="321" y="100" font-size="10" text-anchor="middle" fill="#9dc4b2">opening line, then waits for a reply</text>
+  <text x="321" y="126" font-size="9.5" text-anchor="middle" fill="#9dc4b2">TCP port 24000</text>
+
+  <!-- wiretap -->
+  <rect x="448" y="70" width="208" height="90" rx="5" fill="none" stroke="#e0a34f"/>
+  <text x="552" y="96" font-size="12" text-anchor="middle" fill="#e0a34f">my wiretap</text>
+  <text x="552" y="116" font-size="9.5" text-anchor="middle" fill="#9dc4b2">~100 lines. accepts the</text>
+  <text x="552" y="130" font-size="9.5" text-anchor="middle" fill="#9dc4b2">connection, prints the raw</text>
+  <text x="552" y="144" font-size="9.5" text-anchor="middle" fill="#9dc4b2">bytes, never answers back</text>
+
+  <!-- outcome -->
+  <path d="M448 140 L196 140" stroke="#2e5c46" fill="none" stroke-dasharray="4 3" marker-end="url(#w2)"/>
+  <text x="321" y="158" font-size="9.5" text-anchor="middle" fill="#9dc4b2">silence &#8594; game gives up, writes a crash file</text>
+
+  <text x="24" y="204" font-size="11" fill="#e6efe8">Two runs: the first just watches which port the game knocks on. Then the wiretap</text>
+  <text x="24" y="222" font-size="11" fill="#e6efe8">goes on that port and the game runs again for real.</text>
+  <text x="24" y="250" font-size="11" fill="#5fe0a0">The goal is only to see the client's very first message. A reply was never the point.</text>
+
+  <defs>
+    <marker id="w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#5fe0a0"/></marker>
+    <marker id="w2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2e5c46"/></marker>
+  </defs>
+</svg>

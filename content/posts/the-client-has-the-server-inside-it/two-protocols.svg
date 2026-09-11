@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 330" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="330" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">It isn't one protocol to reverse. It's two, and they're different jobs.</text>
+
+  <!-- before the match -->
+  <rect x="24" y="52" width="310" height="242" rx="5" fill="none" stroke="#e0a34f"/>
+  <text x="179" y="76" font-size="13" text-anchor="middle" fill="#e0a34f">BEFORE the match</text>
+  <g font-size="11.5">
+    <text x="44" y="104">&#8226; log in, authenticate</text>
+    <text x="44" y="128">&#8226; pick a realm</text>
+    <text x="44" y="152">&#8226; get placed into a game</text>
+  </g>
+  <line x1="44" y1="168" x2="314" y2="168" stroke="#2e5c46"/>
+  <text x="44" y="192" font-size="11" fill="#9dc4b2">runs on Auran's own custom system</text>
+  <text x="44" y="212" font-size="11" fill="#9dc4b2">written in C++, only exists as</text>
+  <text x="44" y="230" font-size="11" fill="#9dc4b2">compiled machine code in the .exe</text>
+  <text x="44" y="264" font-size="12" fill="#e0a34f">no decompiler touches this</text>
+  <text x="44" y="282" font-size="10" fill="#9dc4b2">disassembler and a lot of patience</text>
+
+  <!-- in the match -->
+  <rect x="346" y="52" width="310" height="242" rx="5" fill="#14432f" stroke="#5fe0a0"/>
+  <text x="501" y="76" font-size="13" text-anchor="middle" fill="#5fe0a0">IN the match</text>
+  <g font-size="11.5">
+    <text x="366" y="104">&#8226; players moving</text>
+    <text x="366" y="128">&#8226; abilities, damage, deaths</text>
+    <text x="366" y="152">&#8226; everything you see mid-fight</text>
+  </g>
+  <line x1="366" y1="168" x2="636" y2="168" stroke="#2e5c46"/>
+  <text x="366" y="192" font-size="11" fill="#9dc4b2">Unreal Engine 3's standard</text>
+  <text x="366" y="210" font-size="11" fill="#9dc4b2">networking (replication)</text>
+  <text x="366" y="264" font-size="12" fill="#5fe0a0">the code is in the .u files</text>
+  <text x="366" y="282" font-size="10" fill="#9dc4b2">decompile it and read it</text>
+</svg>

@@ -1,0 +1,110 @@
+baseURL: "https://jamerlybob.github.io/fury-devlog/"
+languageCode: "en-us"
+# Bare `date: 2026-09-08` front matter is read in this zone. Without it Hugo uses
+# UTC.
+timeZone: "Pacific/Auckland"
+title: "Reviving Fury"
+theme: "PaperMod"
+
+pagination:
+  pagerSize: 10
+
+enableRobotsTXT: true
+# buildFuture: true — posts ship live the moment they're written (devlog D010),
+# and their timestamps are in Pacific/Auckland, so an evening post is "in the
+# future" when the UTC CI runner builds it. Without this, those posts silently
+# don't render. There are never intentionally-scheduled future posts here, so
+# always building them is correct.
+buildDrafts: false
+buildFuture: true
+buildExpired: false
+
+minify:
+  disableXML: true
+
+params:
+  env: production
+  title: "Reviving Fury"
+  description: "Reverse-engineering and reviving a dead 2007 MMO. A dev log."
+  keywords: [Blog, Portfolio, DevLog, UnrealEngine, GameDev]
+  author: "James"
+  # Posts are numbered in their titles and several land on the same day, so the
+  # day-of-month is noise. Show month + year only. Front-matter dates keep full
+  # timestamps for correct ordering; this only changes what readers see.
+  DateFormat: "January 2006"
+  defaultTheme: dark
+  disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: true
+  ShowToc: true
+  comments: false
+
+  profileMode:
+    enabled: true
+    title: "Reviving Fury"
+    subtitle: "Reverse-engineering a dead 2007 MMO, one broken packet at a time. Following along as I decompile, rebuild, and document the whole process, successes and failures included."
+    imageUrl: ""
+    buttons:
+      - name: Posts
+        url: posts
+      - name: Glossary
+        url: glossary
+      - name: GitHub
+        url: "https://github.com/jamerlybob"
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/jamerlybob"
+
+  assets:
+    disableHLJS: true
+
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: 10
+    - identifier: glossary
+      name: Glossary
+      url: /glossary/
+      weight: 20
+    - identifier: about
+      name: About
+      url: /about/
+      weight: 30
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 40
+
+taxonomies:
+  tag: tags
+  series: series
+
+markup:
+  # Posts embed inline SVG diagrams (FOR-JAMES.md section 6). Without this,
+  # Goldmark silently drops them as "raw HTML".
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: monokai

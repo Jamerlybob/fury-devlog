@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 330" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="330" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="28" font-size="14" fill="#5fe0a0">One class's chunk of the numbered list (simplified to 7 fields)</text>
+
+  <text x="170" y="60" font-size="12" text-anchor="middle" fill="#e0a34f">my list (read from the files)</text>
+  <text x="510" y="60" font-size="12" text-anchor="middle" fill="#5fe0a0">the running game's list</text>
+
+  <g font-size="12" font-family="ui-monospace, Consolas, monospace">
+    <g fill="#9dc4b2" text-anchor="end"><text x="50" y="92">0</text><text x="50" y="122">1</text><text x="50" y="152">2</text><text x="50" y="182">3</text><text x="50" y="212">4</text><text x="50" y="242">5</text><text x="50" y="272">6</text></g>
+    <g><rect x="60" y="76" width="220" height="24" fill="#15402c"/><text x="70" y="92">Physics</text>
+       <rect x="60" y="106" width="220" height="24" fill="#15402c"/><text x="70" y="122">Role</text>
+       <rect x="60" y="136" width="220" height="24" fill="#15402c"/><text x="70" y="152">RemoteRole</text>
+       <rect x="60" y="166" width="220" height="24" fill="#3a2e14" stroke="#e0a34f"/><text x="70" y="182">Owner</text>
+       <rect x="60" y="196" width="220" height="24" fill="#15402c"/><text x="70" y="212">Location</text>
+       <rect x="60" y="226" width="220" height="24" fill="#15402c"/><text x="70" y="242">Rotation</text>
+       <rect x="60" y="256" width="220" height="24" fill="#15402c"/><text x="70" y="272">DrawScale</text></g>
+    <g><rect x="400" y="76" width="220" height="24" fill="#15402c"/><text x="410" y="92">DrawScale</text>
+       <rect x="400" y="106" width="220" height="24" fill="#15402c"/><text x="410" y="122">Rotation</text>
+       <rect x="400" y="136" width="220" height="24" fill="#15402c"/><text x="410" y="152">Location</text>
+       <rect x="400" y="166" width="220" height="24" fill="#3a2e14" stroke="#e0a34f"/><text x="410" y="182">Owner</text>
+       <rect x="400" y="196" width="220" height="24" fill="#15402c"/><text x="410" y="212">RemoteRole</text>
+       <rect x="400" y="226" width="220" height="24" fill="#15402c"/><text x="410" y="242">Role</text>
+       <rect x="400" y="256" width="220" height="24" fill="#15402c"/><text x="410" y="272">Physics</text></g>
+  </g>
+  <g stroke="#9dc4b2" stroke-width="1" opacity="0.7">
+    <line x1="280" y1="88" x2="400" y2="268"/><line x1="280" y1="118" x2="400" y2="238"/><line x1="280" y1="148" x2="400" y2="208"/>
+    <line x1="280" y1="208" x2="400" y2="148"/><line x1="280" y1="238" x2="400" y2="118"/><line x1="280" y1="268" x2="400" y2="88"/>
+  </g>
+  <line x1="280" y1="178" x2="400" y2="178" stroke="#e0a34f" stroke-width="1.5"/>
+  <text x="24" y="306" font-size="11.5" fill="#9dc4b2">Same names, opposite order. The only field that lines up is the middle one, because the middle doesn't move</text>
+  <text x="24" y="322" font-size="11.5" fill="#9dc4b2">when you flip a list. Real totals: 563 numbers, 554 wrong, and the 9 "right" ones were all middles.</text>
+</svg>

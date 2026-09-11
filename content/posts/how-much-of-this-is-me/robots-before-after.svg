@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <defs>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9dc4b2"/></marker>
+  </defs>
+  <rect width="680" height="300" rx="6" fill="#0b2a1d"/>
+
+  <text x="24" y="30" font-size="14" fill="#f2a5a5">Monday: the ticket machine</text>
+  <g font-size="11.5" text-anchor="middle">
+    <rect x="24" y="44" width="90" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="69" y="68">Claude</text>
+    <rect x="134" y="44" width="90" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="179" y="62">writes a</text><text x="179" y="76">ticket</text>
+    <rect x="244" y="44" width="90" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="289" y="62">script grabs</text><text x="289" y="76">a lock</text>
+    <rect x="354" y="44" width="90" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="399" y="68">Codex</text>
+    <rect x="464" y="44" width="90" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="509" y="62">guards</text><text x="509" y="76">check lane</text>
+    <rect x="574" y="44" width="82" height="40" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="615" y="62">commit</text><text x="615" y="76">+ push</text>
+  </g>
+  <g stroke="#9dc4b2" stroke-width="1.5">
+    <line x1="114" y1="64" x2="132" y2="64" marker-end="url(#r)"/>
+    <line x1="224" y1="64" x2="242" y2="64" marker-end="url(#r)"/>
+    <line x1="334" y1="64" x2="352" y2="64" marker-end="url(#r)"/>
+    <line x1="444" y1="64" x2="462" y2="64" marker-end="url(#r)"/>
+    <line x1="554" y1="64" x2="572" y2="64" marker-end="url(#r)"/>
+  </g>
+  <text x="24" y="110" font-size="12" fill="#e0a34f">Tickets actually run in 29 commits: 2.  One of them was Codex writing the manual for Codex.</text>
+
+  <line x1="24" y1="134" x2="656" y2="134" stroke="#2e5c46"/>
+
+  <text x="24" y="164" font-size="14" fill="#5fe0a0">Wednesday: one at a time, and a note on the desk</text>
+  <g font-size="11.5" text-anchor="middle">
+    <rect x="24" y="180" width="130" height="46" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="89" y="200">whichever robot</text><text x="89" y="214">has budget today</text>
+    <rect x="270" y="180" width="140" height="46" rx="4" fill="#3a2e14" stroke="#e0a34f"/><text x="340" y="200">STATE.md</text><text x="340" y="214">"here's the next step"</text>
+    <rect x="526" y="180" width="130" height="46" rx="4" fill="#15402c" stroke="#5fe0a0"/><text x="591" y="200">the other robot,</text><text x="591" y="214">zero memory, next day</text>
+  </g>
+  <g stroke="#9dc4b2" stroke-width="1.5">
+    <line x1="154" y1="203" x2="268" y2="203" marker-end="url(#r)"/>
+    <line x1="410" y1="203" x2="524" y2="203" marker-end="url(#r)"/>
+  </g>
+  <text x="24" y="258" font-size="11.5" fill="#9dc4b2">They can't read each other's chats. If it isn't written in the project folder, it didn't happen.</text>
+  <text x="24" y="280" font-size="11.5" fill="#9dc4b2">A tripwire refuses to save if that note goes six saves without an update.</text>
+</svg>

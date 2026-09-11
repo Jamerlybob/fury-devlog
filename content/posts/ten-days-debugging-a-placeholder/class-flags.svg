@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 280" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="280" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="28" font-size="14" fill="#5fe0a0">The class flags SpawnActor read for each of my four objects</text>
+  <text x="24" y="50" font-size="11.5" fill="#9dc4b2">Only the very last bit matters here. It means CLASS_Abstract: "not a real thing, don't build one".</text>
+
+  <g font-family="ui-monospace, Consolas, monospace" font-size="13">
+    <text x="24" y="92">scoreboard</text>        <text x="200" y="92">0x800892</text> <text x="320" y="92">...1001 001</text><text x="430" y="92" fill="#5fe0a0">0</text><text x="470" y="92" fill="#5fe0a0">built</text>
+    <text x="24" y="126">player info</text>       <text x="200" y="126">0x8008b2</text> <text x="320" y="126">...1011 001</text><text x="430" y="126" fill="#5fe0a0">0</text><text x="470" y="126" fill="#5fe0a0">built</text>
+    <text x="24" y="160">player controller</text> <text x="200" y="160">0x8008b7</text> <text x="320" y="160">...1011 011</text><text x="430" y="160" fill="#f2a5a5">1</text><text x="470" y="160" fill="#f2a5a5">return null</text>
+    <text x="24" y="194">body (pawn)</text>       <text x="200" y="194">0x800ab7</text> <text x="320" y="194">...1011 011</text><text x="430" y="194" fill="#f2a5a5">1</text><text x="470" y="194" fill="#f2a5a5">return null</text>
+  </g>
+  <rect x="422" y="72" width="26" height="134" rx="3" fill="none" stroke="#e0a34f" stroke-width="1.5"/>
+  <text x="435" y="222" font-size="11" text-anchor="middle" fill="#e0a34f">bit 0</text>
+
+  <text x="24" y="256" font-size="11.5" fill="#9dc4b2">The two that failed were the two class names I'd typed in myself as placeholders, and marked "provisional".</text>
+</svg>

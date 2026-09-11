@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="300" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">The shortcut: one copy of the game being both halves at once</text>
+
+  <!-- normal -->
+  <text x="24" y="62" font-size="11" fill="#9dc4b2">normally</text>
+  <rect x="24" y="72" width="150" height="52" rx="5" fill="none" stroke="#9dc4b2"/>
+  <text x="99" y="94" font-size="11" text-anchor="middle">your PC</text>
+  <text x="99" y="110" font-size="9.5" text-anchor="middle" fill="#9dc4b2">client</text>
+  <path d="M176 98 L286 98" stroke="#9dc4b2" fill="none" marker-end="url(#l)"/>
+  <rect x="288" y="72" width="180" height="52" rx="5" fill="none" stroke="#9dc4b2"/>
+  <text x="378" y="94" font-size="11" text-anchor="middle">the company's machine</text>
+  <text x="378" y="110" font-size="9.5" text-anchor="middle" fill="#9dc4b2">server: gone</text>
+
+  <!-- listen -->
+  <text x="24" y="168" font-size="11" fill="#5fe0a0">listen server</text>
+  <rect x="24" y="178" width="220" height="52" rx="5" fill="#14432f" stroke="#5fe0a0"/>
+  <text x="134" y="200" font-size="11" text-anchor="middle" fill="#5fe0a0">your PC</text>
+  <text x="134" y="216" font-size="9.5" text-anchor="middle" fill="#9dc4b2">client AND server, one process</text>
+  <path d="M370 204 L246 204" stroke="#5fe0a0" fill="none" marker-end="url(#l2)"/>
+  <rect x="372" y="178" width="180" height="52" rx="5" fill="none" stroke="#5fe0a0"/>
+  <text x="462" y="200" font-size="11" text-anchor="middle">a friend's PC</text>
+  <text x="462" y="216" font-size="9.5" text-anchor="middle" fill="#9dc4b2">connects straight to you</text>
+
+  <text x="24" y="262" font-size="11" fill="#e6efe8">If Fury's client can do this, most of the problem evaporates. No match server to rebuild.</text>
+  <text x="24" y="284" font-size="11" fill="#e0a34f">The one word that turns it on, `listen`, kills the game in half a second. Sealed, like the rest.</text>
+
+  <defs>
+    <marker id="l" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#9dc4b2"/></marker>
+    <marker id="l2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#5fe0a0"/></marker>
+  </defs>
+</svg>

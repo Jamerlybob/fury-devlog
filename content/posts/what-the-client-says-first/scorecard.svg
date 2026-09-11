@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 356" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <rect width="680" height="356" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="30" font-size="15" fill="#5fe0a0">Half a day of poking the client. The scorecard.</text>
+
+  <g font-size="12">
+    <line x1="24" y1="48" x2="656" y2="48" stroke="#2e5c46"/>
+
+    <text x="30" y="74">Boots on Windows 11?</text>
+    <text x="300" y="74" fill="#5fe0a0">YES</text>
+    <text x="350" y="74" font-size="10" fill="#9dc4b2">first try, clean shutdown</text>
+    <line x1="24" y1="88" x2="656" y2="88" stroke="#183a2b"/>
+
+    <text x="30" y="114">Gameplay screen with no server?</text>
+    <text x="300" y="114" fill="#e0a34f">ONE</text>
+    <text x="350" y="114" font-size="10" fill="#9dc4b2">character creation only, offline fallback</text>
+    <line x1="24" y1="128" x2="656" y2="128" stroke="#183a2b"/>
+
+    <text x="30" y="154">Start it as a dedicated server?</text>
+    <text x="300" y="154" fill="#f2a5a5">NO</text>
+    <text x="350" y="154" font-size="10" fill="#9dc4b2">`server` treated as a map name, crash</text>
+    <line x1="24" y1="168" x2="656" y2="168" stroke="#183a2b"/>
+
+    <text x="30" y="194">Open the level editor?</text>
+    <text x="300" y="194" fill="#f2a5a5">NO</text>
+    <text x="350" y="194" font-size="10" fill="#9dc4b2">same path, VC++ runtime error</text>
+    <line x1="24" y1="208" x2="656" y2="208" stroke="#183a2b"/>
+
+    <text x="30" y="234">Host a match for itself (listen server)?</text>
+    <text x="300" y="234" fill="#f2a5a5">NO</text>
+    <text x="350" y="234" font-size="10" fill="#9dc4b2">one word `listen`, dead in half a second</text>
+    <line x1="24" y1="248" x2="656" y2="248" stroke="#183a2b"/>
+
+    <text x="30" y="274">See the login handshake in plaintext?</text>
+    <text x="300" y="274" fill="#f2a5a5">NO</text>
+    <text x="350" y="274" font-size="10" fill="#9dc4b2">TLS from the first byte, port 24000</text>
+    <line x1="24" y1="288" x2="656" y2="288" stroke="#2e5c46"/>
+  </g>
+
+  <text x="30" y="316" font-size="12" fill="#5fe0a0">The client is in great shape. There is no shortcut in.</text>
+  <text x="30" y="338" font-size="11" fill="#9dc4b2">Four developer doors, all welded shut before release. The only road left is the decompile.</text>
+</svg>

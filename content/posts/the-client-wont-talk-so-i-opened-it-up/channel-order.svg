@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 230" font-family="IBM Plex Sans, ui-sans-serif, system-ui, sans-serif" fill="#e6efe8">
+  <defs>
+    <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e0a34f"/></marker>
+  </defs>
+  <rect width="680" height="230" rx="6" fill="#0b2a1d"/>
+  <text x="24" y="28" font-size="14" fill="#5fe0a0">Objects point at each other by pipe number, so the order matters</text>
+
+  <g font-size="12">
+    <rect x="24" y="60" width="140" height="56" rx="5" fill="#15402c" stroke="#5fe0a0"/>
+    <text x="94" y="82" text-anchor="middle">pipe 1</text>
+    <text x="94" y="100" text-anchor="middle" font-size="11" fill="#9dc4b2">match info (scoreboard)</text>
+
+    <rect x="184" y="60" width="140" height="56" rx="5" fill="#15402c" stroke="#5fe0a0"/>
+    <text x="254" y="82" text-anchor="middle">pipe 2</text>
+    <text x="254" y="100" text-anchor="middle" font-size="11" fill="#9dc4b2">player info</text>
+
+    <rect x="344" y="60" width="140" height="56" rx="5" fill="#15402c" stroke="#5fe0a0"/>
+    <text x="414" y="82" text-anchor="middle">pipe 3</text>
+    <text x="414" y="100" text-anchor="middle" font-size="11" fill="#9dc4b2">player controller</text>
+
+    <rect x="504" y="60" width="150" height="56" rx="5" fill="#15402c" stroke="#5fe0a0"/>
+    <text x="579" y="82" text-anchor="middle">pipe 4</text>
+    <text x="579" y="100" text-anchor="middle" font-size="11" fill="#9dc4b2">the body (pawn)</text>
+  </g>
+
+  <path d="M414 116 C 414 150, 254 150, 254 120" fill="none" stroke="#e0a34f" stroke-width="1.5" marker-end="url(#c)"/>
+  <text x="334" y="160" font-size="11" text-anchor="middle" fill="#e0a34f">"my player info is pipe 2"</text>
+  <path d="M579 116 C 579 176, 414 176, 414 120" fill="none" stroke="#e0a34f" stroke-width="1.5" marker-end="url(#c)"/>
+  <text x="500" y="190" font-size="11" text-anchor="middle" fill="#e0a34f">"my controller is pipe 3"</text>
+
+  <text x="24" y="216" font-size="11.5" fill="#9dc4b2">You can't mention pipe 3 before pipe 3 exists. So they go in this order, each one fully open first.</text>
+</svg>
