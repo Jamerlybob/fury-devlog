@@ -103,10 +103,67 @@ bookkeeping doesn't think it has anywhere to send the message to. Next step is
 to catch the object red-handed at the exact moment it tries, and read its own
 fields to see what it thinks is missing.
 
+## Catching it red-handed
+
+So that was the plan: catch the object at the exact moment it decides not to
+send anything, and read its own fields to see what it thinks is wrong.
+
+First problem, I didn't actually know which of the game's thousands of live
+objects to read, or where in memory to find the one field I cared about
+("who's my controller"). Games don't ship with a helpful map saying "this
+byte means that". I had to build a small tool that walks the game's own
+internal bookkeeping, the same lookup table the game itself uses to figure
+out which byte means what, and ask it "where does the property called
+Controller live on this particular object".
+
+I built it, ran it, and it told me it couldn't find the field at all. Not "the
+field is empty", genuinely "I searched and there's nothing here called
+Controller". That's the kind of result that should make you suspicious of
+your own tool before you get excited about what it's telling you, so I added
+a sanity check: ask the same tool to find a *different* field I already knew
+the answer to from earlier work. It failed that one too, in a suspicious way
+(the same object kept reporting the exact same number of fields at six
+different, genuinely different points in its family tree, which isn't how
+real data behaves). So the tool was lying to me. Good thing I checked.
+
+Rather than debug that approach further, I switched to a technique from two
+sessions ago that I already knew worked: instead of walking the game's static
+blueprint of a class, watch the *live* lookup the game itself performs while
+it's actually receiving data over the network, and borrow the answer it comes
+up with. Same sanity check against the field I already knew, and this time it
+came back exactly right.
+
+With a trustworthy way to find the field, I read it, twice, on two separate
+runs of the game. Both times: the field isn't empty. My leading theory was
+dead on arrival, the "who's my controller" question, which I'd worried might
+be pointing at nothing and crashing the function silently, genuinely has an
+answer.
+
+But then I read the two fields sitting right next to it, and this is where it
+gets strange. Every actor in this game engine carries two flags that answer
+"who's actually in charge of me, the server or the client I'm running on".
+For the game's own controller, on the client's own screen, both of those
+flags say "the server". Both of them. On the client. About its own local
+copy of the thing it's supposedly a client's-eye view of.
+
+That shouldn't happen, or at least, it doesn't match either of the two ways
+I'd have expected it to go wrong. And there's a good reason to think it
+matters: if this game object genuinely believes it already has full server
+authority over itself, it would have no reason to ask permission before
+doing something, which is exactly what "send a message asking the server to
+acknowledge I'm done loading" is. It would just quietly do the thing locally
+and never bother the network at all. That would explain the silence
+perfectly. It's not proof yet, but it's the first theory this session that
+actually fits every single piece of evidence I've collected so far.
+
 ## Where this leaves things
 
 Clock's fixed (pending one more live check that the banner actually stays
 gone). The bigger blocker, the one standing between "the arena renders" and
-"I can actually move my character", is narrower than it was this morning but
-still open. No manufactured ending here, it's genuinely unresolved. Next
-session's job.
+"I can actually move my character", took two real steps forward today: one
+dead theory buried with actual evidence instead of a guess, and one new,
+genuinely strange clue that fits everything I know so far. Still unresolved.
+Next job is figuring out exactly where in the handoff from server to client
+those two "who's in charge" flags are supposed to flip, and whether my
+server needs to hand them over already flipped instead of trusting the
+client to do it.
