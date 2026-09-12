@@ -217,3 +217,87 @@ shows up on the one object with the longest family tree of the four. Next
 job: catch the raw number as it comes off the wire for that specific message,
 before anything tries to look up what it means, and see whether it's already
 wrong by the time it gets there.
+
+## Hand-decoding the whole message, bit by bit
+
+So that's what I did, the slow way: I took the exact raw bytes for my player
+controller's very first message and decoded every single bit of it by hand,
+against my own written spec for how each piece is supposed to be packed.
+Tedious, but it can't lie to me the way a half-trusted tool can.
+
+The first forty three bits matched my spec exactly: an identifier for which
+object this message is about, then a compressed 3D position. Good, that part
+of my understanding is solid. Then came the two values I'd been chasing:
+first the "who's in charge" field again (nine bits saying which property this
+is, then some number of bits for the actual answer), then, immediately after
+it, the second field.
+
+Here's the catch. That "some number of bits" isn't fixed. It depends on how
+many possible answers the field has. For this particular field there are
+four real answers ("nobody", "the server", "a remote copy", "the local
+player"), so I'd assumed three bits worth of room, since three bits can count
+up to eight and the game's own compiler, I knew, quietly adds one extra,
+unused placeholder answer to every list like this, making five entries
+total, and I was rounding up from five.
+
+My server was sending three bits. When I read what the client actually
+consumed, bit by bit, it only ever took two. One bit short. And that missing
+bit doesn't just vanish, it becomes the first bit of the *next* thing the
+client reads, the identifier for the second field. Every single bit after
+that point is shifted one place to the left. I checked the exact number that
+produces: the second field's identifier is supposed to be 19, and shift it
+left by one bit and you get 38. That's the number I'd been seeing in every
+failed decode for two sessions. Not a coincidence, not a rounding error, the
+exact fingerprint a one-bit-too-narrow field leaves on everything that comes
+after it.
+
+## Finding out why the field is one bit too narrow
+
+Knowing the field was one bit short is not the same as knowing why. My own
+notes, and the game's own diagnostic tool that I'd built earlier, both
+agreed: five possible answers (four real ones plus the compiler's silent
+placeholder) should need three bits. So either my count of five was wrong,
+or the rule "count every possible answer, including the placeholder" was
+wrong.
+
+First I checked the count itself, no assumptions. I wrote a small tool that
+walks every one of the eleven compiled script files the game loads and lists
+every single place any of them defines something with this field's exact
+name, in case two different files define two different, unrelated things
+that happen to share a name and the game was quietly picking the wrong one.
+There is exactly one. Five entries, in the one file I expected. That theory's
+dead.
+
+So the rule itself had to be wrong, and the only way to know for sure was to
+go back to the actual compiled game code and read, instruction by instruction,
+what it does. I pointed my disassembler at the exact function that decides
+how many bits a field like this gets, and there it was: right before it works
+out the bit count, it takes the count of five and subtracts one, every time,
+no exceptions. Then it does the "how many bits to fit this many values" math
+on *that* number, four, not five.
+
+Four values need two bits. That's it. That's the whole bug. The placeholder
+answer the compiler adds gets counted for bookkeeping purposes, but the game
+never actually sends it as a real answer over the network, so it never
+budgets wire space for it at all. My spec had the right idea (count the
+placeholder) but the wrong conclusion (give it room on the wire too).
+
+I fixed the one line of code that had it wrong, reran my full test suite (it
+now checks the corrected rule instead of the old broken one), and recomputed
+that same player controller message by hand: 43 bits for the position, 11
+bits for each of the two fields I'd been chasing, forty three plus eleven
+plus eleven, sixty five bits total. Which is exactly the number my earlier
+hand-decode said the whole message needed to add up cleanly. Three completely
+separate checks (the shipped game files, a live recording of the real
+client reading real bits, and the compiled code itself) all agree on the
+same two-bit answer. I'm about as sure of this one as reverse engineering
+ever lets you be.
+
+## Where this leaves things
+
+The immediate mystery that kicked off this whole thread, "why does the
+client never say it's done loading", isn't confirmed fixed yet; that needs
+one more live run against the real client to watch it actually recover past
+this fix. But the specific, reproducible bug this thread turned up along the
+way is fixed and proven consistent on paper. Next job: run it live and watch
+whether that missing message finally shows up.
