@@ -503,3 +503,21 @@ completely unrelated, like an animation frame counter. Didn't chase it
 further tonight. But there's a script now that can ask this question without
 me standing on a platform holding a stopwatch, which feels like the more
 useful outcome of the two anyway.
+
+## Just telling it to walk
+
+The robot couldn't settle the falling theory on its own, so instead of
+chasing the one mystery byte further, I tried the other end of it: stop
+guessing what physics state the character is in and just tell the server to
+say, out loud, "this one's walking." Same trick I already use for who owns
+the character (a value I already send every time it spawns), just pointed at
+a different field. If the parabolas are really freefall with extra steps,
+saying "walking" out loud should fix them. If they're not, saying it won't
+change anything, and that's useful information too.
+
+Wired it up, same pattern as the existing one, rebuilt, ran my whole offline
+test suite. Everything still passes, byte for byte, which just means I
+haven't broken anything I could already prove worked. It says nothing about
+whether the actual fix does anything, because that only shows up on a real
+screen with a real character on it, and I didn't get to sit down and watch
+it tonight. So: shipped the idea, haven't seen it move yet.
