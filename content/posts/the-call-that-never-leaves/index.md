@@ -472,3 +472,34 @@ Two mysteries now instead of one: where did my body go, and why do I move
 like I'm made of physics homework. Not solving either tonight. But "does the
 character move" has a real answer for the first time, and it's yes, and I'm
 choosing to be happy about that part.
+
+## Getting a robot to stand on the platform for me
+
+Testing the falling theory properly means someone standing there watching a
+number for a while, and I am not always around to be that someone, so I
+wrote something that stands in for me. It spawns the client itself, points a
+memory scanning tool at whatever object the server just spawned, and reads
+its numbers back without a live human touching a key.
+
+First run, it confidently reported that every single thing spawned on the
+level, my player, the HUD, the camera, the scoreboard info, all of it, was
+named "the world itself." Not a great start. Turned out I'd told it to read
+the wrong one of a function's several arguments, so it was reading the level
+container instead of the thing actually being spawned. An entertaining way
+to be wrong, at least: it wasn't confused, it was extremely confident and
+extremely wrong in exactly the same way every time.
+
+Fixed that, pointed it at my actual character, and watched a number called
+Location.Z, the character's height off the ground, for twelve straight
+seconds with nobody touching the controls. It did not move once. Not a
+flicker, not a decimal place. Whatever else is wrong with this thing, it is
+not quietly sinking through the floor when nobody's looking, which is one
+less thing to worry about.
+
+Somewhere nearby in memory, one single byte out of about nine hundred I was
+watching changed value once, from five to four, about seven seconds after
+spawning in. No idea yet if that's the physics state flipping or something
+completely unrelated, like an animation frame counter. Didn't chase it
+further tonight. But there's a script now that can ask this question without
+me standing on a platform holding a stopwatch, which feels like the more
+useful outcome of the two anyway.
