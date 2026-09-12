@@ -621,3 +621,84 @@ already had lying around from three other things I'd checked this session.
 That's the part I like about actually asking the memory instead of arguing
 about it: even the theories that turn out wrong get to be wrong fast. Back
 to the physics hook next.
+
+## The physics hook, and a much bigger bug hiding behind it
+
+So I built the hook. There's one piece of code, inside the same function
+that reads every replicated value off the wire, that actually applies a
+value to a live object: it looks up which property this next chunk of bits
+is for, then hands the raw bits and a memory address to one more function
+that writes the value in. Hook that one spot and you see, for every single
+property on every single object, the exact address about to be written and
+what's sitting there before and after. No more nine hundred candidate bytes.
+Just the real ones, caught in the act.
+
+First run, no hands on the keyboard, just watching four objects open their
+channels: my player, its controller, and the two scoreboard style objects.
+And immediately something looked wrong that had nothing to do with physics
+at all. The two scoreboard objects applied exactly the two values I told the
+server to send for them, cleanly, same as always. My player and its
+controller, the two objects actually at the centre of every mystery this
+month, applied almost nothing sensible. One of them looked like it was
+reading a completely different property than anything I ever sent, with a
+value that didn't match what my own server's own diagnostic tool says that
+property should even be called. The physics value I'd spent two sessions
+chasing wasn't there at all. Neither was "who owns this character", the
+value I'd already fixed weeks ago and had been trusting ever since.
+
+That's a much bigger problem than "one flag is wrong." That's "this whole
+message is being read starting from the wrong bit," which is the kind of
+bug that doesn't explain one symptom, it explains all of them at once,
+because everything after the mistake reads as nonsense too.
+
+Only two of my four objects have this problem, and only two don't, which
+gave me something to compare instead of just being confused. The two clean
+ones (the scoreboard objects) never send a starting direction the character
+should be facing. The two broken ones (my player and its controller) do,
+because I actually bothered to give them a real spawn direction a few
+sessions back instead of leaving it blank. That extra bit of "which way are
+you facing" is optional, exactly twelve bits when it's there, and I went
+and checked the actual compiled game code for the rule that decides whether
+the client should expect it. The client doesn't look at anything the server
+sends to decide that. It looks at its own already loaded copy of the
+object's blueprint and reads one single flag baked into that blueprint at
+compile time. My server never checked that flag. It just decided "the
+character and its controller are the kind of thing that should get a
+starting direction" and sent one anyway, twelve bits the client was never
+going to read, and then read everything after those twelve bits one bit too
+soon for the rest of the message. Every mystery from this whole thread,
+missing physics, missing ownership flags, an invisible body, was sitting
+downstream of the exact same twelve bits.
+
+Went and checked which of this game's objects actually turn that flag on,
+by name, in the game's own decompiled defaults, out of curiosity as much as
+anything: exactly three, and all three are the kind of thing you'd expect,
+physics props and vehicles that need to fall over convincingly the instant
+they spawn. Nothing shaped like a person or a controller is in that list.
+My own two objects had no business getting that flag at all.
+
+Deleted the guess, told the server to stop sending that direction, rebuilt,
+and ran the exact same hook again. My player's controller now applies
+exactly its two real values, cleanly, no garbage in between. My player
+applies all three of its real values, including physics, and the byte
+sitting at that address goes from whatever the game spawns you with by
+default straight to the exact number that means "walking." Caught the write
+itself doing it, not inferred from a candidate scan. Two sessions of
+chasing one wrong byte, and the byte was never broken. The message it lived
+inside of was being read from the wrong starting point the entire time.
+
+Traded something away to get there, though: my character no longer gets a
+starting facing direction sent this way, since that's the very thing I
+turned off. Small, separate fix owed later.
+
+## Where this actually leaves things
+
+Everything I can check without a human at the keyboard now says the wire is
+finally clean: the right values, at the right addresses, on both of the
+objects that have been wrong for weeks. What I still haven't watched is
+whether any of this shows up as an actual character standing on that
+platform instead of an empty one, or as normal walking instead of whatever
+that "almost parabolic" thing was. Headless scripts can't see a screen.
+That's the next live check, and it's the one that actually answers whether
+this month's two open mysteries were ever really two mysteries at all,
+rather than one bug wearing two costumes.
