@@ -411,3 +411,64 @@ out, the client's own network layer treats it as sent, and now a name for what
 it's saying every frame after that. What I still haven't done is watch my own
 character actually move on screen, which is the whole point of any of this.
 That's the next live check.
+
+## The next live check, and I fell through the world
+
+So I did the live check. Sat there and watched my own client connect to my
+own server, and the camera just kept falling. No ground, no floor, nothing
+below me, just falling in silence for a couple of minutes while the map got
+smaller and smaller behind me.
+
+![The Fury client's camera, mid fall, with the EL1_Mortem map already tiny and far below.](fell-through-the-map.gif)
+
+Turned out to be my own fault, and a dumb one. Weeks ago, when I first got a
+character-shaped thing onto the server's books at all, I had to tell the
+client *where* to put it, and I didn't have a real answer for that yet, so I
+typed in zero, zero, zero and told myself I'd come back to it. I did not come
+back to it. Zero, zero, zero is just a point floating in empty space above
+(or below, unclear) the actual level, so my poor pawn had been faithfully
+falling through the void this entire time and nothing was ever going to catch
+it.
+
+The fix, once I actually looked, was almost insultingly easy: the map file
+itself is just another one of these Unreal package files I've been reading
+all month, and it has actual spawn points baked into it with actual
+coordinates. Pointed the same decompiler-adjacent tool I use for the script
+files at the map instead, asked it to list every `GOPlayerStart`, and got
+four of them back, tagged "Deathschool," sitting at a real height with real
+ground presumably underneath. Copied one in. Rebuilt. Ran it again.
+
+![Standing (not falling) on the Deathschool platform, full combat HUD up: health bar, ability hotbar, minimap, the lot.](standing-on-deathschool.png)
+
+No more falling. Actual HUD came up, too, which I wasn't expecting to just
+work: health bar, ability bar, minimap, all of it, rendering fine against a
+real position in the world for the first time.
+
+Except there's no character in that screenshot. Zoomed all the way out,
+looking straight down at where I should be standing, and it's just... empty
+platform. Nobody home.
+
+So we poked at it a bit more. Moved the mouse, camera turned, normal. Hit
+WASD, camera moved, so something is definitely being driven around by my
+inputs. Which is, technically, the entire point of this whole month of
+work, an actual answer to "does the character move," except there's no
+character to look at while it happens, which takes a lot of the satisfaction
+out of it.
+
+![Same platform, camera pulled all the way back, and still nobody there.](no-character.gif)
+
+And the movement itself is weird. Not walking-weird, more like being lobbed.
+My mate watching it happen called it "almost parabolic," which is exactly
+right and also a very funny way to describe your own player character, and
+it happens to line up with an actual thing I half remember reading in the
+game's own movement code: there's a whole separate physics state for
+"falling" versus "walking," and nothing I've found so far ever flips the
+switch to walking. So there's a real chance my little invisible guy hasn't
+landed at all and is just doing very short hops of freefall every time I
+press a direction key, which would explain the parabolas perfectly and would
+also be extremely on brand for this project.
+
+Two mysteries now instead of one: where did my body go, and why do I move
+like I'm made of physics homework. Not solving either tonight. But "does the
+character move" has a real answer for the first time, and it's yes, and I'm
+choosing to be happy about that part.
