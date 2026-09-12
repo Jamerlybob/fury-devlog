@@ -572,3 +572,52 @@ into a yes. What I need next is to stop staring at a haystack and instead
 catch the exact moment the client writes that specific field, by hooking the
 one piece of code that already has to know which field is which to unpack
 the message at all. That's a real address, not another maybe.
+
+## Checking if anybody's actually home
+
+Before I go build that hook, James asked the question that had been sitting
+underneath the whole physics theory without either of us saying it out loud:
+what if there's no character being driven here at all, and the "floaty
+camera" is just a camera doing what a camera does when nothing is attached
+to it. In this engine, if a controller never actually gets handed a
+character to drive, its default view is a free floating spectator style
+camera that takes raw keyboard input as plain movement in space. No ground,
+no collision, up and down for free. Which, notably, is exactly the new
+symptom from the last section. A real, physics driven character, walking or
+falling or anything else, has no reason to ever accept "go straight up" from
+a keyboard. That one detail is already evidence against my own theory, and I
+hadn't clocked it until James said it back to me.
+
+Good thing to check before spending an evening on the physics hook, and
+cheap to check for real, because I already have the pieces sitting around
+from the last few things I did. I know exactly where the character object
+landed in memory and exactly where the controller object landed, the same
+way I've been finding everything else this month: watch it get created
+rather than guess where it lives.
+
+The way "who's driving whom" works under the hood is always the same shape.
+The controller keeps a pointer that says "this is the body I'm driving."
+The body keeps a pointer back that says "this is who's driving me." And the
+actual on screen camera, which is its own separate object, keeps a pointer
+to whatever it's currently looking through. Three pointers, three yes or no
+questions, and I can read all three straight out of the client's own memory
+without touching a line of its code.
+
+Asked all three. The controller has a pointer to the character. The
+character has a pointer back to the controller. And the actual camera, the
+thing deciding what shows up on screen, has its own pointer, and it points
+at the character too. Ran the whole check twice, from a fresh spawn each
+time, and got the same three answers at the same three spots in memory both
+times, which is the kind of repeat result that makes me trust it.
+
+So: nobody's home isn't it. Somebody is very much home. Whatever's standing
+on that platform, or floating over it, is the real character, and the real
+camera really is watching it. Which means the floaty feeling and the
+invisible body are genuine bugs in how that character moves and renders,
+not a wiring problem where the camera never got plugged into anything.
+
+One theory down clean, in about twenty minutes, for free, using addresses I
+already had lying around from three other things I'd checked this session.
+That's the part I like about actually asking the memory instead of arguing
+about it: even the theories that turn out wrong get to be wrong fast. Back
+to the physics hook next.
