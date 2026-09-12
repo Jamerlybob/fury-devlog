@@ -4,7 +4,7 @@ date: 2026-09-12T00:30:00+12:00
 draft: true
 tags: ["fury", "reverse-engineering", "networking", "unreal-engine-3"]
 series: ["Reviving Fury"]
-summary: "I fixed the clock from last post. Then I went looking for the one message the client refuses to send, and proved something I didn't expect: it's not lost in transit, it never leaves the building."
+summary: "I fixed the clock from last post. Then I went looking for the one message the client refuses to send, chased two dead ends that turned out to be real bugs anyway, and found the one wrong flag actually stopping it."
 ShowToc: true
 ---
 
@@ -301,3 +301,93 @@ one more live run against the real client to watch it actually recover past
 this fix. But the specific, reproducible bug this thread turned up along the
 way is fixed and proven consistent on paper. Next job: run it live and watch
 whether that missing message finally shows up.
+
+## Running it live, and a decoy
+
+Ran it live. The two-bit fix held up exactly as the paper math said it
+would: every message decoded clean, on all four of my game objects, with
+zero of the "stopped partway through" breaks I'd been chasing for a week.
+Nice. And as a bonus, that same fix quietly cured the "who's in charge" field
+too, the one that was reading "the server" on both sides of itself. It was
+never a separate bug. It was one property landing on the truncated side of
+the exact same two-bit cut, every time.
+
+Which meant I got to cross a theory off the list, except it was the wrong
+one to cross off. My leading suspect for "why won't the client tell me it's
+done loading" had been: it thinks it already has full authority over itself,
+so why would it ask permission for anything. Fixed the field. Watched it
+read the correct values this time. The client still never sent the message.
+Dead theory, in the most annoying way a theory can die: it was real, it was
+wrong on the wire, fixing it was worth doing on its own merits, and it had
+nothing to do with the thing I actually wanted fixed.
+
+## The one function that can't lie to me
+
+Back to the drawing board, except this time with a much better tool than
+last week. There is exactly one function, out of the entire client
+executable, that decides whether a script call to another object runs
+straight away on your own machine or gets shipped off to the server instead.
+Every "hey, do this thing" message in the entire game funnels through it.
+Hook that one, and it doesn't matter how weird the path getting there is,
+you catch it.
+
+I'd actually found this function two weeks ago and misread what it did,
+mistook a completely unrelated bit of bookkeeping code sitting in the same
+neighbourhood for it. This time I went back and found the real one by a
+trick I like more each time I use it: instead of guessing which function
+does what from a string it happens to print, I diff two objects' entire
+lists of internal functions against each other and see what's actually
+*different* between them. My message-sending object has ninety extra
+functions the generic base object doesn't. One of those ninety, and only
+one, contains this exact sentence, baked right into the compiled code as an
+error message nobody's ever meant to see: "received script function call
+for object not correctly attached to world, ignoring". That's not a guess.
+That's the function introducing itself.
+
+Read what it actually does, instruction by instruction, and near the top
+there's a check on one single thing: what does the object making this call
+believe about its own authority. If it thinks it's "the server", the
+function takes a special detour meant for split-screen and demo-recording
+edge cases, checks two extra conditions that are never true in a normal
+single-player-looking-at-a-server session, and quietly returns having done
+nothing at all. Any other belief about its own authority, and it skips that
+detour entirely and just sends the message.
+
+Which is exactly the flag I fixed two sections ago. Except I fixed the
+*bug* in how it was decoded, not the *value* my own server was choosing to
+send in the first place. My server was telling my own player's controller
+"you have full server authority over yourself", because that's genuinely
+what the server object looks like from the server's own point of view, and
+I'd assumed the client's own startup logic would sort out the perspective
+flip on its own. It doesn't. That flip only happens once, before any of the
+actual values arrive over the wire, and then those values just overwrite
+whatever it produced. Whatever I send is what the client ends up believing,
+full stop. A real server sends its own player's own controller a swapped
+pair of these two flags, specifically because of that overwrite, and I was
+sending the unswapped one.
+
+Two lines of code, swap which value goes out for which flag, just for your
+own controller specifically. Rebuilt, ran it live: that exact function now
+fires for the exact message I've been chasing since post 19, and it returns
+"handled" instead of doing nothing. Traffic that used to be a flat line
+after the first second turned into a steady stream, thousands of messages
+over a forty second hold, roughly one every few milliseconds, which is
+suspiciously close to "once a frame". I haven't decoded what's actually in
+them yet. But something my client believed about itself was wrong for two
+weeks, I found the one line that mattered, and the silence is over.
+
+## Where this actually leaves things
+
+Three separate bugs in this one thread, and only the last one was the thing
+I originally went looking for. The wire fix from two sections ago was real
+and worth doing. The "who's in charge" flag was a genuine symptom of it, not
+a separate mystery, even though chasing it as one taught me things I needed
+anyway. And the actual answer to "why won't it tell me it's done loading"
+turned out to be one wrong value, sent because I assumed a piece of the
+client's startup logic would do more than it actually does.
+
+Not calling this one done yet. I've got wire-level proof the message goes
+out and the client's own network layer treats it as sent. I don't yet know
+what those thousands of new per-second messages actually say, and I haven't
+watched my own character move on screen, which is the actual thing all of
+this was ever in service of. That's the next live check.
