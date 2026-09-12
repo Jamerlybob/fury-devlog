@@ -519,5 +519,24 @@ Wired it up, same pattern as the existing one, rebuilt, ran my whole offline
 test suite. Everything still passes, byte for byte, which just means I
 haven't broken anything I could already prove worked. It says nothing about
 whether the actual fix does anything, because that only shows up on a real
-screen with a real character on it, and I didn't get to sit down and watch
-it tonight. So: shipped the idea, haven't seen it move yet.
+screen with a real character on it.
+
+So I sat down and watched it. Ninety seconds, WASD and mouse, same as before.
+
+Didn't fix it. Still no character on screen. Still moves weird. And there's
+a new detail that makes the whole theory look shakier than it did an hour
+ago: I can now move up and down, freely, just by pressing keys, which is
+exactly the thing that isn't supposed to happen once something is "walking"
+instead of "falling." Walking means the ground decides your height, not your
+keyboard. If the fix had taken, I should have gotten *more* stuck to the
+floor, not more airborne.
+
+Which means one of two things is true, and I don't know which yet: either
+the value I'm sending never actually reaches the client at all, or it
+reaches it and the client's own movement code doesn't care what I sent in
+the first place, because it's already busy running its own copy of "what am
+I doing right now" locally and only listens to my server when I bother to
+correct it, which I never have. I haven't caught the byte in the act this
+time, so I'm not guessing between those two. Next job is exactly that:
+watch the actual number on the actual object the moment it exists, before
+arguing about what it means.
