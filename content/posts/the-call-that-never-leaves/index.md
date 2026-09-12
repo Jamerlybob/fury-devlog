@@ -376,6 +376,26 @@ suspiciously close to "once a frame". I haven't decoded what's actually in
 them yet. But something my client believed about itself was wrong for two
 weeks, I found the one line that mattered, and the silence is over.
 
+## The flood has a name
+
+Left that thousands-of-messages-a-second flood as an open question. Went and
+answered it properly instead of guessing: wrote a little script that reads the
+raw bytes of a captured session and looks up each message's number against a
+list of every function the game's own compiled script knows about, so it can
+tell me "number 50 means this one" instead of me making that up. Important
+bit: it pulls that list fresh every time instead of using one I wrote down by
+hand weeks ago, because I already had one of those lying around from an
+earlier session and it was wrong, quietly, in a way that would have relabelled
+everything if I'd trusted it. The numbers move every time I fix something
+upstream. Lesson noted.
+
+Pointed the fixed version at the exact capture from the fix above: 2288
+messages, and 2279 of them are the same thing, a function called
+DualServerMove. That's the client saying "here's where I'm trying to go,"
+sent twice over for reliability, because it's never once heard back from
+anything it's sent, which tracks, because my server doesn't listen to any of
+this yet. It just lets the shouting land in a bin.
+
 ## Where this actually leaves things
 
 Three separate bugs in this one thread, and only the last one was the thing
@@ -387,7 +407,7 @@ turned out to be one wrong value, sent because I assumed a piece of the
 client's startup logic would do more than it actually does.
 
 Not calling this one done yet. I've got wire-level proof the message goes
-out and the client's own network layer treats it as sent. I don't yet know
-what those thousands of new per-second messages actually say, and I haven't
-watched my own character move on screen, which is the actual thing all of
-this was ever in service of. That's the next live check.
+out, the client's own network layer treats it as sent, and now a name for what
+it's saying every frame after that. What I still haven't done is watch my own
+character actually move on screen, which is the whole point of any of this.
+That's the next live check.
