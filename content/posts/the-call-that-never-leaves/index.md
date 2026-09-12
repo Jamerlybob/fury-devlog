@@ -540,3 +540,35 @@ correct it, which I never have. I haven't caught the byte in the act this
 time, so I'm not guessing between those two. Next job is exactly that:
 watch the actual number on the actual object the moment it exists, before
 arguing about what it means.
+
+James watched the whole thing happen and had a better name for the symptom
+than I did: it's not really a character stuck falling, it's more like a
+floaty camera with nobody home. Fair. Writing that down as-is rather than
+folding it into whichever theory I already liked.
+
+## Running the same robot twice and comparing notes
+
+So, one more thing before bed: I reran the exact same no-hands robot script
+from last time, unchanged, except this time pointed at the server that's now
+supposedly telling the client "walk," instead of saying nothing. Same
+technique, same idle twelve seconds, still no keyboard involved. The
+question was narrow: does the number that's supposed to mean "you're
+walking now" actually show up anywhere different than it did before I made
+the change?
+
+Lined the two runs up side by side. Every single spot I'd flagged last time
+as "maybe this is the physics state" holds the exact same value it held
+before I ever touched anything. Nowhere does it read "walking." The one byte
+that changed on its own last time, the one I already suspected was probably
+just an animation counter and not the real thing, did the same trick again
+tonight, just backwards, at almost the identical moment. That's not what a
+real state landing looks like. That's noise repeating itself.
+
+So: nine hundred candidate spots, watched twice, before and after, and not
+one of them shows any sign of the value I told the server to send. Which
+means the honest answer to tonight's actual question, "did my fix even
+arrive," is looking like no. Guessing at more bytes isn't going to turn that
+into a yes. What I need next is to stop staring at a haystack and instead
+catch the exact moment the client writes that specific field, by hooking the
+one piece of code that already has to know which field is which to unpack
+the message at all. That's a real address, not another maybe.
