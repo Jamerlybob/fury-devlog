@@ -723,3 +723,28 @@ On screen, though, there is still no visible character. There is a shadow.
 That is progress, and a much narrower problem, but it is not a character
 standing in the arena yet. The next check is what makes that newly built
 body visible to its own camera.
+
+## The body was hiding from the camera that owned it
+
+The next check was almost embarrassingly literal. The camera was sitting
+inside the character. Distance zero. At that distance Fury switches to first
+person and tells the character mesh not to draw for the person looking through
+it. It still casts a shadow, which is why the screenshot had a shadow and no
+body. The game was doing exactly what it had been asked to do. I had just
+forgotten to ask it to put the camera anywhere sensible.
+
+The normal game fixes this during the ordinary spawn routine. It hands the
+player their character, then sends one small "face this way" message. That
+message also runs the local camera reset code. My server had copied the first
+half and missed the second, because of course the camera setup is hiding inside
+a rotation message.
+
+Added that one message, using the real direction from the arena's player start,
+and checked the running client again. Camera distance is now six. First person
+is off. The mesh is no longer hidden from its owner. The skeletal mesh and its
+shadow are both still there.
+
+That fixes the specific reason the body was invisible. I still need one proper
+run with hands on keyboard before I call it done, because a robot can read a
+flag but it cannot tell me whether the person is actually standing there and
+walking like a person. It is at least no longer hiding from itself.
