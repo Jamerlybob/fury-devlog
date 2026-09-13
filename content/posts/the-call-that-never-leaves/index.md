@@ -724,27 +724,53 @@ That is progress, and a much narrower problem, but it is not a character
 standing in the arena yet. The next check is what makes that newly built
 body visible to its own camera.
 
-## The body was hiding from the camera that owned it
+## The fix that wasn't
 
-The next check was almost embarrassingly literal. The camera was sitting
-inside the character. Distance zero. At that distance Fury switches to first
-person and tells the character mesh not to draw for the person looking through
-it. It still casts a shadow, which is why the screenshot had a shadow and no
-body. The game was doing exactly what it had been asked to do. I had just
-forgotten to ask it to put the camera anywhere sensible.
+The next memory check looked almost embarrassingly literal. The camera had a
+distance of zero, which puts it inside the character. Fury responds by switching
+to first person and hiding your own body from you. It still casts a shadow. That
+was such a neat match for what James saw that I added the normal spawn message
+which tells the player to face the right way. One run then showed a camera
+distance of six and the hiding flag switched off.
 
-The normal game fixes this during the ordinary spawn routine. It hands the
-player their character, then sends one small "face this way" message. That
-message also runs the local camera reset code. My server had copied the first
-half and missed the second, because of course the camera setup is hiding inside
-a rotation message.
+James tried it. Movement felt normal. Still no person.
 
-Added that one message, using the real direction from the arena's player start,
-and checked the running client again. Camera distance is now six. First person
-is off. The mesh is no longer hidden from its owner. The skeletal mesh and its
-shadow are both still there.
+I came back later and ran the same check from a fresh client. Distance zero.
+First person on. Body hidden. Five checks over thirty seconds all said the same
+thing. The packet sent by my server was byte for byte the same as the apparently
+successful run, so the packet hadn't fixed the camera at all. Something else in
+that earlier run had moved it and I had given the wrong thing credit. Lovely.
 
-That fixes the specific reason the body was invisible. I still need one proper
-run with hands on keyboard before I call it done, because a robot can read a
-flag but it cannot tell me whether the person is actually standing there and
-walking like a person. It is at least no longer hiding from itself.
+The decompiled game code explains why. That spawn message resets the camera
+angles, but once the character already exists it deliberately keeps the current
+zoom. Starting at zero means staying at zero. I can force the zoom to six in a
+diagnostic and watch first person turn off immediately, but that only removes
+one reason not to draw. It doesn't produce the missing body.
+
+## Following the body factory
+
+Fury doesn't load one finished character model. It loads a face, hair, shirt,
+arms, hands, legs and feet, then a native bit of the engine stitches those seven
+pieces into one new model while the game is running. The other two available
+slots, shoulders and helmet, are empty for this plain test outfit.
+
+I found that whole factory in the original executable and put a hook on every
+stage. The request reaches it. All seven named parts load. The pre build step
+succeeds. The worker thread builds four levels of detail. The post build step
+succeeds and hands the result back to the character. No missing chest warning,
+no broken mesh warning, no failed texture warning.
+
+Then I kept going because apparently I no longer know when to leave a perfectly
+healthy corpse alone. The finished model has 56 bones and thousands of valid
+vertices. Its animation transforms are finite numbers. Its scene object exists.
+Its materials are compiled for skeletal meshes. The generated colour and normal
+textures are on the graphics card, and every sampled character vertex lands on
+an opaque part of the colour texture. The light environment is attached too.
+Even the engine's last rendered timestamp advances.
+
+Which leaves a very specific and slightly rude result: the body factory works.
+The render setup looks healthy. Fury still shows a shadow and no body.
+
+The next place to stand is inside the renderer itself, after that live scene
+object receives the stitched mesh. At least the haystack is now on screen rather
+than spread across nine body parts, two cameras and an entire dead MMO backend.
