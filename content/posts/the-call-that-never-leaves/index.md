@@ -702,3 +702,24 @@ that "almost parabolic" thing was. Headless scripts can't see a screen.
 That's the next live check, and it's the one that actually answers whether
 this month's two open mysteries were ever really two mysteries at all,
 rather than one bug wearing two costumes.
+
+
+## A shadow, at least
+
+The next check caught an assumption I should have questioned sooner. My
+player had a mesh component, so I had treated that as evidence that there
+ought to be a body inside it. There wasn't. Looking directly at the running
+client showed an empty mesh, and all nine body parts still marked as data
+that had never arrived.
+
+The game builds a person from those parts. My server had been telling it
+that loading was finished without sending them. I added a plain test
+appearance using the face, hair and default clothing already shipped with
+the client. Checked the order of the fields against the running game first,
+which felt particularly necessary after the rotation mistake.
+
+The data now arrives correctly, and the empty mesh becomes a real mesh.
+On screen, though, there is still no visible character. There is a shadow.
+That is progress, and a much narrower problem, but it is not a character
+standing in the arena yet. The next check is what makes that newly built
+body visible to its own camera.
