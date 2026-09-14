@@ -1,6 +1,6 @@
 ---
 title: "20. Somebody's Home"
-date: 2026-09-14T16:00:00+12:00
+date: 2026-09-13T12:00:00+12:00
 draft: false
 tags: ["fury", "reverse-engineering", "networking", "unreal-engine-3", "frida"]
 series: ["Reviving Fury"]
@@ -30,7 +30,7 @@ format, go and read the actual compiled code that does it.
 
 So I did. I pointed Ghidra (a free tool that turns compiled game code back
 into readable, C-like pseudocode) at the exact function, and it turned out to
-be almost insultingly simple: it's the *identical* code to the float version,
+be almost insultingly simple: it's the _identical_ code to the float version,
 byte for byte, except one instruction changed from "copy 4 bytes" to "copy 8
 bytes". No trickery, no downcasting to save space. I wrote the C# to match,
 round-tripped a pile of test values through it (including the classic
@@ -52,7 +52,7 @@ Small, satisfying fix. On with the actual mystery.
 
 Quick recap for anyone just joining: the game world now genuinely loads. The
 loading screen drops, the arena renders, my character's HUD comes up. But the
-instant that happens, the game is *supposed* to send one particular message
+instant that happens, the game is _supposed_ to send one particular message
 back to the server, basically "hey, I'm done loading, loading screen's gone."
 It never arrives. I've known this for a couple of sessions and each time I've
 written "not chased yet" and moved on to something more tractable.
@@ -62,7 +62,7 @@ exactly **one** function, in the entire multi-megabyte client executable,
 that actually puts a reliable message onto the wire. Every single kind of
 network traffic (chat, replicated data, remote function calls, all of it)
 funnels through this one piece of code before it ever touches a socket. If I
-hook that one function, I *cannot* miss the message, no matter which weird
+hook that one function, I _cannot_ miss the message, no matter which weird
 code path it takes to get there.
 
 So that's what I did. I wrote a script that attaches to the running client
@@ -86,7 +86,7 @@ Going in, my leading theory was that the "I'm done loading" call was sneaking
 out through some other, harder-to-see path, maybe through a virtual function
 table lookup that my earlier static analysis (reading the disassembly cold,
 without running anything) couldn't trace back to its caller. That would've
-been a real headache: it'd mean the call *was* leaving, just via a route I
+been a real headache: it'd mean the call _was_ leaving, just via a route I
 hadn't found yet.
 
 This experiment kills that theory outright. Since the hook sits on the actual
@@ -121,7 +121,7 @@ I built it, ran it, and it told me it couldn't find the field at all. Not
 "the field is empty", genuinely "I searched and there's nothing here called
 Controller". That's the kind of result that should make you suspicious of
 your own tool before you get excited about what it's telling you, so I added
-a sanity check: ask the same tool to find a *different* field I already knew
+a sanity check: ask the same tool to find a _different_ field I already knew
 the answer to from earlier work. It failed that one too, in a suspicious way
 (the same object kept reporting the exact same number of fields at six
 different, genuinely different points in its family tree, which isn't how
@@ -129,7 +129,7 @@ real data behaves). So the tool was lying to me. Good thing I checked.
 
 Rather than debug that approach further, I switched to a technique from two
 sessions ago that I already knew worked: instead of walking the game's
-static blueprint of a class, watch the *live* lookup the game itself
+static blueprint of a class, watch the _live_ lookup the game itself
 performs while it's actually receiving data over the network, and borrow the
 answer it comes up with. Same sanity check against the field I already knew,
 and this time it came back exactly right.
@@ -158,7 +158,7 @@ perfectly.
 
 ## Chasing the flags, and finding something else entirely
 
-I had a specific, concrete idea of *how* those two flags might end up both
+I had a specific, concrete idea of _how_ those two flags might end up both
 saying "the server": my earlier reading said the client applies a batch of
 properties one at a time, in a fixed order, and if it stops partway through
 that batch for the controller object specifically, it would land on exactly
@@ -217,7 +217,7 @@ entries total, and I was rounding up from five.
 
 My server was sending three bits. When I read what the client actually
 consumed, bit by bit, it only ever took two. One bit short. And that missing
-bit doesn't just vanish, it becomes the first bit of the *next* thing the
+bit doesn't just vanish, it becomes the first bit of the _next_ thing the
 client reads, the identifier for the second field. Every single bit after
 that point is shifted one place to the left. I checked the exact number that
 produces: the second field's identifier is supposed to be 19, and shift it
@@ -249,7 +249,7 @@ instruction, what it does. I pointed my disassembler at the exact function
 that decides how many bits a field like this gets, and there it was: right
 before it works out the bit count, it takes the count of five and subtracts
 one, every time, no exceptions. Then it does the "how many bits to fit this
-many values" math on *that* number, four, not five.
+many values" math on _that_ number, four, not five.
 
 Four values need two bits. That's it. That's the whole bug. The placeholder
 answer the compiler adds gets counted for bookkeeping purposes, but the game
@@ -303,7 +303,7 @@ neighbourhood for it. This time I went back and found the real one by a
 trick I like more each time I use it: instead of guessing which function
 does what from a string it happens to print, I diff two objects' entire
 lists of internal functions against each other and see what's actually
-*different* between them. My message-sending object has ninety extra
+_different_ between them. My message-sending object has ninety extra
 functions the generic base object doesn't. One of those ninety, and only
 one, contains this exact sentence, baked right into the compiled code as an
 error message nobody's ever meant to see: "received script function call
@@ -320,7 +320,7 @@ nothing at all. Any other belief about its own authority, and it skips that
 detour entirely and just sends the message.
 
 Which is exactly the flag I fixed two sections ago. Except I fixed the
-*bug* in how it was decoded, not the *value* my own server was choosing to
+_bug_ in how it was decoded, not the _value_ my own server was choosing to
 send in the first place. My server was telling my own player's controller
 "you have full server authority over yourself", because that's genuinely
 what the server object looks like from the server's own point of view, and
@@ -378,7 +378,7 @@ smaller and smaller behind me.
 
 Turned out to be my own fault, and a dumb one. Weeks ago, when I first got a
 character-shaped thing onto the server's books at all, I had to tell the
-client *where* to put it, and I didn't have a real answer for that yet, so I
+client _where_ to put it, and I didn't have a real answer for that yet, so I
 typed in zero, zero, zero and told myself I'd come back to it. I did not
 come back to it. Zero, zero, zero is just a point floating in empty space
 above (or below, unclear) the actual level, so my poor pawn had been
