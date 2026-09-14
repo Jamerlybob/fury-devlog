@@ -1,7 +1,7 @@
 ---
 title: "The Shortcut Was Already Running"
 date: 2026-09-14
-draft: true
+draft: false
 tags: ["fury", "unreal-engine-3", "networking", "reverse-engineering"]
 series: ["Reviving Fury"]
 summary: "I finally checked the project's biggest shortcut test and realised the working game had already answered it."
@@ -40,9 +40,38 @@ each realm, but the actual web request lives in compiled C++ code, so I am not
 inventing that part.
 
 I pointed the avatar screen at a passive listener on localhost and waited. Zero
-bytes. Merely loading the screen does not make the request. Next I need to
-trigger the update command and catch exactly what the client asks for, then give
-it the smallest honest answer.
+bytes.
+
+Then I read the timer properly. It waits sixty seconds after the map finishes
+loading, not sixty seconds after the program starts. The request finally arrived
+about eighty three seconds into the next run:
+
+```text
+GET / HTTP/1.1
+Accept: */*
+User-Agent: Fury
+Host: 127.0.0.1:18080
+Cache-Control: no-cache
+```
+
+No mystery packet format. No account token. Just a web request for `/` from a
+user agent called `Fury`.
+
+I added a tiny service which answers with the smallest thing the decompiled
+parser accepts:
+
+```text
+<realmID=1 status=0>
+```
+
+The final check was inside the running client. Before the response, its realm
+array was empty. Afterwards it contained one entry: realm 1, status 0, which
+means normal.
+
+There was one last fossil in the code. The old realm selection screen cannot
+actually appear in this build. Its `show()` function selects realm 1 and returns
+before drawing the list. The updater still works underneath it. The screen is
+just already skipping the question.
 
 For now the important bit is settled. Direct arena play does not need Fury's
 original account protocol at all. One very unpleasant branch of the roadmap has
