@@ -38,7 +38,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: No dashes in content
         run: |
-          if grep -rn -e '—' -e '–' -e '―' content/; then
+          if grep -rn --include='*.md' -e '—' -e '–' -e '―' content/; then
             echo "::error::em/en dash found in content/ ; use commas, colons or parens (blog voice rule)"
             exit 1
           fi
