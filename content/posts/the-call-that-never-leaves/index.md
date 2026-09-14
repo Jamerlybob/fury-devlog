@@ -51,7 +51,7 @@ For the first time, the client genuinely knew that my character was walking.
 The movement stopped feeling like physics homework and the full combat HUD came
 up around an actual position in the arena.
 
-![Standing on the Deathschool platform with the combat HUD, but still no visible character.](standing-on-deathschool.png)
+![Mortem seen from very far away, with the combat HUD up but no visible character.](mortem-but-very-far-away.gif)
 
 There was just one small problem. I still couldn't see the character.
 
@@ -62,7 +62,7 @@ way in, which switches to first person and hides your own body. Pulling the
 camera back changed the right visibility flag, but the platform remained empty.
 The shadow stayed, which felt a little smug.
 
-![The camera is pulled back and moving, but the person casting the shadow is nowhere to be seen.](no-character.gif)
+![Mortem now has a character mesh, even if the finished person still refuses to appear.](mortem-but-we-have-mesh.gif)
 
 The player did have a mesh component, but that turned out not to mean it had a
 body. Fury doesn't load one finished character model. It takes a face, hair,
