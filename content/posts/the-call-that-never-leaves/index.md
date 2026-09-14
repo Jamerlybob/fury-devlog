@@ -774,3 +774,50 @@ The render setup looks healthy. Fury still shows a shadow and no body.
 The next place to stand is inside the renderer itself, after that live scene
 object receives the stitched mesh. At least the haystack is now on screen rather
 than spread across nine body parts, two cameras and an entire dead MMO backend.
+
+## The corpse had one more complaint
+
+I found the exact bit of the renderer responsible for deciding whether this one
+character gets drawn. Not every character, not every model, this particular
+stitched body sitting on this particular platform. The old executable still
+carries enough scraps of its original class names to identify the right scene
+object, and the running game gave me the matching address.
+
+The renderer asks two questions before it bothers drawing a player. First, is
+this body meant to be visible to this camera? In first person the answer is no,
+on purpose. I moved the diagnostic camera back before the body was created and
+that answer became yes.
+
+Then the second question quietly killed it anyway.
+
+The player was still in what the game calls its reference pose. That's the raw
+arms out pose a character starts in before an animation system takes over. Fury
+has a native flag for it, and the renderer is wonderfully blunt: if this is a
+real game rather than the editor, don't draw that player at all. It increments a
+little counter beside the flag, returns zero, and carries on rendering the rest
+of the arena. Hence the excellent shadow cast by a person the game had decided
+not to show me.
+
+I cleared that flag once inside the diagnostic hook, just to prove the branch.
+The renderer immediately changed its answer and entered the skeletal draw code.
+Useful proof, terrible fix.
+
+The actual cause was back in my pretend loadout. A new Fury player starts with
+its weapon type set to `UNSET`. After the body factory finishes, the client uses
+the weapon type to choose its animation sets and animation tree, the machinery
+that decides which pose comes next. For `UNSET`, the original code explicitly
+does nothing. My server supplied a face, hair, clothes and skin colour, but never
+supplied that last choice. The finished person stayed in the raw starting pose
+forever, so the renderer kept refusing to draw it forever. Very principled.
+
+I changed the test loadout to Fury's `UAR` animation family. The shipped socket
+table gives that family no weapon models, which suits this plain test character,
+and it gives the client a real animation tree to initialise. Fresh run, no poke
+at the pose flag: reference pose false. Camera visibility yes. Renderer answer
+nonzero. The exact skeletal draw function starts firing continuously.
+
+That is the first clean run where the server's real data reaches the original
+client and the whole body pipeline ends in draw calls, without patching the
+client or propping the result up inside a memory hook. I still owe it the only
+test that matters to a normal person: look at the actual screen, zoom out, walk
+around, and confirm there is finally a moving human attached to the shadow.
