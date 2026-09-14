@@ -8,15 +8,14 @@ summary: "Two separate mysteries about a client that refuses to talk to my serve
 ShowToc: true
 ---
 
-Last post I found out why the game kept yelling "Connection Interrupted" at me:
-my server never told the client what time it was, so its own internal clock
-drifted off and tripped an alarm. This post starts with a small leftover from
-that fix, then goes looking for something much bigger that's been sitting in
-my notes for a couple of sessions: why does the client never tell my server
-it's done loading. That one question turns into three separate bugs, then
-turns into an entirely different mystery about a character who won't show up
-on screen, and it ends with the actual thing this whole project has been
-working towards since post one. Get a coffee, this is a big one.
+Fury's loading screen was finally dropping, but the client still had two
+problems: after about twenty seconds it raised "Connection Interrupted", and
+it never sent the server the RPC which says loading is finished. The first was
+a missing clock update. The second turned out to involve an enum that was one
+bit too wide, an authority flag sent from the wrong point of view, and a
+player controller silently deciding that its network call belonged locally.
+
+Then the controller started talking and I fell through the map. Anyway.
 
 ## The small one: teaching the wire a new number
 
@@ -28,12 +27,39 @@ is a "double", a wider, more precise decimal, and I'd never seen the game
 write one of those before. Rule I set myself ages ago: never guess a wire
 format, go and read the actual compiled code that does it.
 
-So I did. I pointed Ghidra (a free tool that turns compiled game code back
-into readable, C-like pseudocode) at the exact function, and it turned out to
-be almost insultingly simple: it's the _identical_ code to the float version,
-byte for byte, except one instruction changed from "copy 4 bytes" to "copy 8
-bytes". No trickery, no downcasting to save space. I wrote the C# to match,
-round-tripped a pile of test values through it (including the classic
+So I did. RTTI gave me the `UDoubleProperty` vtable at `0x114280B4`.
+`NetSerializeItem` is slot `+0x134`, which resolves to `0x10D961C0`. Ghidra's
+entire useful output for it was this:
+
+```asm
+MOV  EAX,[ESP+0x0c]
+PUSH ESI
+MOV  ESI,[ESP+0x08]
+PUSH EAX
+MOV  EAX,0x8
+CALL 0x10912550        ; FArchive::ByteOrderSerialize(Data, Count)
+MOV  EAX,0x1
+POP  ESI
+RET  0x0c
+```
+
+The float and integer versions have the same 29 byte shape and call the same
+serializer. Their immediate is `0x4`; the double version's is `0x8`. That's
+the whole format: copy eight bytes through the archive. No trickery, no
+downcast to a four byte float.
+
+On this little endian machine, `83.828` becomes:
+
+```text
+double 83.828
+bits  = 0x4054F4FDF3B645A2
+wire  = A2 45 B6 F3 FD F4 54 40
+```
+
+The server's bit writer only accepts 32 bits per call, so the C# writes the
+low word and then the high word. That produces the same eight bytes without
+inventing a special case in the bit writer. I round-tripped a pile of test
+values through it (including the classic
 double-precision troublemakers, `double.Epsilon`, `MinValue`, `MaxValue`) and
 checked the raw bytes matched what .NET's own number library would produce.
 All green.
@@ -65,14 +91,46 @@ funnels through this one piece of code before it ever touches a socket. If I
 hook that one function, I _cannot_ miss the message, no matter which weird
 code path it takes to get there.
 
-So that's what I did. I wrote a script that attaches to the running client
-(via Frida, a tool for injecting your own code into somebody else's
-already-running program) and hooks that one send function, logging every
-single call it gets plus a full stack trace of who called it. Then I ran a
-real session: server up, client spawned, held it open for ninety seconds
-after the loading screen dropped.
+So that's what I did. Frida attached directly to `UChannel::SendBunch` at
+`0x10B3CAD0`. The useful core of the probe was small:
 
-Result: 26 calls right at the start (the normal handshake chatter), then
+```javascript
+const BASE = ptr('0x10900000');
+function va(address) { return BASE.add(address - 0x10900000); }
+
+Interceptor.attach(va(0x10B3CAD0), {
+  onEnter(args) {
+    const channel = this.context.ecx;
+    const chIndex = channel.add(0x2c).readS32();
+    send({
+      event: 'SendBunch',
+      chIndex,
+      trace: Thread.backtrace(this.context, Backtracer.ACCURATE)
+        .map(DebugSymbol.fromAddress)
+    });
+  }
+});
+```
+
+This is a 32 bit MSVC build, so `this` arrives in `ECX`; `channel+0x2c` is the
+channel index. The executable is fixed at image base `0x10900000`, which is
+why those virtual addresses can be used directly instead of resolving an
+ASLR slide first.
+
+Then I ran a real session: server up, client spawned, held it open for ninety
+seconds after the loading screen dropped.
+
+The trace had a very distinctive shape:
+
+```text
+startup       SendBunch ch=0  calls 1..26
+load complete OnLoadingCompleteCheck
+load complete DisableLoadingScreen> 1
+next 83 sec   no SendBunch calls
+shutdown      SendBunch ch=0  call 27, UChannel::Close
+```
+
+So: 26 calls right at the start (the normal handshake chatter), then
 **nothing**. Not one more call to that function for the entire ninety
 seconds, right up until I forced the client to close and it sent one final
 "I'm disconnecting" message on its way out. The client's own log file
@@ -89,9 +147,12 @@ without running anything) couldn't trace back to its caller. That would've
 been a real headache: it'd mean the call _was_ leaving, just via a route I
 hadn't found yet.
 
-This experiment kills that theory outright. Since the hook sits on the actual
-function body, it doesn't matter how the call gets there, direct call,
-virtual dispatch, whatever. If the message left the process, I would have
+This experiment kills that theory outright. A virtual call loads a function
+pointer from the object's vtable and does an indirect `CALL` through it.
+Ghidra may not have a static cross reference because the target is only known
+at runtime. Frida patches the target function's first instructions, so both
+`CALL 0x10B3CAD0` and `CALL [EAX+slot]` land on the same hook. If the message
+left the process, I would have
 seen it. It didn't. Which means the call isn't going missing on the way out:
 **something is stopping it from being sent in the first place**, before it
 ever gets anywhere near the networking code.
@@ -200,6 +261,29 @@ controller's very first message and decoded every single bit of it by hand,
 against my own written spec for how each piece is supposed to be packed.
 Tedious, but it can't lie to me the way a half-trusted tool can.
 
+The live bit reader told me exactly where it was:
+
+```text
+FBitReader @ ESI
+  Data     [ESI+0x78]
+  NumBits  [ESI+0x84] = 67
+  Pos      [ESI+0x88] = 54
+mask table 0x115A1C74 = 01 02 04 08 10 20 40 80
+```
+
+That mask table shows that the stream is LSB first. Bit zero is
+`byte & 0x01`, bit one is `byte & 0x02`, and so on. It looks backwards if you
+write the bytes as ordinary hex, so I wrote the fields out in consumption
+order instead:
+
+```text
+bits 00..31  archetype object reference       NetIndex 32405
+bits 32..42  compressed location              (0, 0, 0)
+bits 43..51  property handle                  18 = Role
+bits 52..54  server's Role payload            1 1 0
+bits 54..62  client's next handle, misaligned 0 1 1 0 0 1 0 0 0 = 38
+```
+
 The first forty three bits matched my spec exactly: an identifier for which
 object this message is about, then a compressed 3D position. Good, that part
 of my understanding is solid. Then came the two values I'd been chasing:
@@ -250,6 +334,15 @@ that decides how many bits a field like this gets, and there it was: right
 before it works out the bit count, it takes the count of five and subtracts
 one, every time, no exceptions. Then it does the "how many bits to fit this
 many values" math on _that_ number, four, not five.
+
+```asm
+MOV  EAX,[ECX+0x80]    ; UByteProperty::Enum
+TEST EAX,EAX
+JZ   plain_byte
+MOV  EAX,[EAX+0x48]    ; Enum->Names.Num() = 5
+SUB  EAX,0x1           ; drop compiler-generated _MAX
+CALL appCeilLogTwo     ; ceil(log2(4)) = 2
+```
 
 Four values need two bits. That's it. That's the whole bug. The placeholder
 answer the compiler adds gets counted for bookkeeping purposes, but the game
@@ -311,8 +404,20 @@ for object not correctly attached to world, ignoring". That's not a guess.
 That's the function introducing itself.
 
 Read what it actually does, instruction by instruction, and near the top
-there's a check on one single thing: what does the object making this call
-believe about its own authority. If it thinks it's "the server", the
+there's a check on one single byte:
+
+```c
+// AActor::ProcessRemoteFunction, 0x10B48050
+if (*(uint8_t *)(Actor + 0x56) == ROLE_Authority) {
+    if (Actor->GetViewportClient() == NULL || demo_helper() == NULL)
+        return 0;                       // no bunch is ever built
+}
+
+connection = GWorld->NetDriver->ServerConnection; // NetDriver + 0x50
+return CallRemoteFunction(connection, Actor, Function, Params);
+```
+
+`Actor+0x56` is `Role`. If the object thinks it's "the server", the
 function takes a special detour meant for split-screen and demo-recording
 edge cases, checks two extra conditions that are never true in a normal
 single-player-looking-at-a-server session, and quietly returns having done
@@ -332,8 +437,14 @@ full stop. A real server sends its own player's own controller a swapped
 pair of these two flags, specifically because of that overwrite, and I was
 sending the unswapped one.
 
-Two lines of code, swap which value goes out for which flag, just for your
-own controller specifically. Rebuilt, ran it live: that exact function now
+The distinction here matters. On the server, the controller really is
+`Role=Authority` and `RemoteRole=AutonomousProxy`; those values decide which
+replication conditions run. On the owning client, the pair sent over the wire
+must be swapped so the local copy sees itself as the autonomous proxy. I had
+used one pair for both jobs.
+
+Two lines of code, swap which value goes out for which flag, just for the
+owning controller specifically. Rebuilt, ran it live: that exact function now
 fires for the exact message I've been chasing since post 19, and it returns
 "handled" instead of doing nothing. Traffic that used to be a flat line
 after the first second turned into a steady stream, thousands of messages
@@ -360,6 +471,12 @@ DualServerMove. That's the client saying "here's where I'm trying to go,"
 sent twice over for reliability, because it's never once heard back from
 anything it's sent, which tracks, because my server doesn't listen to any of
 this yet. It just lets the shouting land in a bin.
+
+```text
+actor channel 3, 2288 inbound bunches
+  handle 50  DualServerMove  2279  99.6%
+  everything else               9   0.4%
+```
 
 Three separate bugs in that one thread, and only the last one was the thing
 I originally went looking for. Wire-level proof the message goes out, the
@@ -392,6 +509,17 @@ coordinates. Pointed the same decompiler-adjacent tool I use for the script
 files at the map instead, asked it to list every `GOPlayerStart`, and got
 four of them back, tagged "Deathschool," sitting at a real height with real
 ground presumably underneath. Copied one in. Rebuilt. Ran it again.
+
+```text
+GOPlayerStart "Deathschool"
+Location = (X=-6470.0273438, Y=3197.3193359, Z=4311.3168945)
+float32  = 38 30 CA C5  1C D5 47 45  89 BA 86 45
+```
+
+Those last twelve bytes are the three IEEE 754 floats as they sit in memory.
+They became useful later: instead of guessing the pawn's `Location` offset, a
+Frida probe scanned the live actor for that exact triplet and got an address
+grounded in a value I had actually sent.
 
 ![Standing (not falling) on the Deathschool platform, full combat HUD up: health bar, ability hotbar, minimap, the lot.](standing-on-deathschool.png)
 
@@ -474,6 +602,26 @@ every single object, the exact address about to be written and what's
 sitting there before and after. No more candidate bytes. Just the real
 ones, caught in the act.
 
+The call site is inside `UActorChannel::ReceivedBunch`:
+
+```asm
+10B3E4E6  MOV  EAX,[EDI]          ; UProperty vtable
+10B3E4E8  MOV  EAX,[EAX+0x134]    ; NetSerializeItem
+10B3E4EE  MOV  ECX,EDI            ; this = property
+10B3E4F1  CALL EAX                ; write into EBX
+10B3E4F3  TEST EAX,EAX
+```
+
+Frida could not hook the two byte `CALL EAX`; there was not enough instruction
+space for its trampoline relocator. I hooked `0x10B3E4E6` for the before state
+and `0x10B3E4F3` for the after state instead. That gave logs like this once the
+message was fixed:
+
+```text
+GOCombatAvatar  property=Physics  target=Actor+0x54
+bytes-before=00  bytes-after=01  value=PHYS_Walking
+```
+
 First run, no hands on the keyboard, just watching four objects open their
 channels. And immediately something looked wrong that had nothing to do
 with physics at all. The two scoreboard objects applied exactly the two
@@ -506,6 +654,22 @@ bits the client was never going to read, and then read everything after
 those twelve bits one bit too soon for the rest of the message. Every
 mystery from this whole thread, missing physics, missing ownership flags,
 an invisible body, was sitting downstream of the exact same twelve bits.
+
+The actor's flag word is at archetype offset `+0x84`; bit 23 is
+`bNetInitialRotation`:
+
+```c
+bool readRotation = ((*(uint32_t *)(Archetype + 0x84) >> 23) & 1) != 0;
+if (readRotation)
+    Bunch << CompressedRotator;    // 12 bits for this spawn value
+```
+
+There is no presence bit in the packet. Sender and receiver must consult the
+same class default and therefore already agree. My server's `isSpatial`
+shortcut said yes. The real player and controller archetypes said no. The
+client left those twelve bits unread and treated their first bit as the start
+of the first property handle. From there the parser was doing exactly what I
+asked, which was unfortunately nonsense.
 
 Checked which of this game's objects actually turn that flag on, by name,
 in the game's own decompiled defaults, out of curiosity as much as
@@ -586,6 +750,20 @@ pre-build step succeeds. The worker thread builds four levels of detail.
 The post-build step succeeds and hands the result back to the character. No
 missing chest warning, no broken mesh warning, no failed texture warning.
 
+```text
+0x10E123E0  CharacterManager::RequestMesh
+0x10F635B0  CharacterManagerLoader::StartAsyncLoading
+0x10E1C9D0  CharacterManagerWorkerThread::PreBuild       ret=1
+0x10E1C360  CharacterManagerWorkerThread::Run
+0x10E1D070  CharacterManagerWorkerThread::PostBuild      ret=1
+0x10E12B00  CharacterManager::InitializeMeshComponent
+
+LOD0 vertices=2775  UV finite=2775  outside [0,1]=0
+LOD1 vertices=1717  UV finite=1717  outside [0,1]=0
+LOD2 vertices=754   UV finite=754   outside [0,1]=0
+bones=56
+```
+
 Then I kept going because apparently I no longer know when to leave a
 perfectly healthy corpse alone. The finished model has 56 bones and
 thousands of valid vertices. Its animation transforms are finite numbers.
@@ -623,9 +801,27 @@ all. It increments a little counter beside the flag, returns zero, and
 carries on rendering the rest of the arena. Hence the excellent shadow cast
 by a person the game had decided not to show me.
 
+The live object layout and branch ended up being this compact:
+
+```text
+GOCombatAvatar +0x234  bIsInRefPose       bit 0 = 1
+GOCombatAvatar +0x238  RefPoseDrawCounter
+scene proxy    +0x104  owning avatar pointer
+global       0x116092A8 editor mode       = 0
+```
+
+```c
+if (!editorMode && avatar->bIsInRefPose) {
+    avatar->RefPoseDrawCounter++;
+    return 0;                       // no dynamic skeletal draw relevance
+}
+```
+
 I cleared that flag once inside the diagnostic hook, just to prove the
 branch. The renderer immediately changed its answer and entered the
-skeletal draw code. Useful proof, terrible fix.
+skeletal draw code with relevance bits `0x12`. Useful proof, terrible fix.
+Changing memory in a hook is a very elaborate way to lie to yourself if you
+leave it there.
 
 The actual cause was back in my pretend loadout. A new Fury player starts
 with its weapon type set to `UNSET`. After the body factory finishes, the
@@ -664,7 +860,10 @@ Turned out to be embarrassingly simple: a much earlier playtest (the one
 where James first confirmed the shadow and the camera fix, a few sections
 back) had needed one extra flag on the server's command line to get the
 client past a package-negotiation step, and I'd just forgotten to type it
-this time. Added the flag back, no code changes anywhere, ran it again.
+this time. The working combination was `--actors all --uses --basepkg omit`.
+Without `--uses`, `JOIN` still completes and all four actor channels open, but
+the client waits forever for the `USES` and `HAVE` package exchange. Added the
+flag back, no code changes anywhere, ran it again.
 
 ## Somebody's home
 
@@ -689,30 +888,8 @@ ago, not an empty mesh casting a shadow for nobody, an actual visible human
 being moved around by actual keyboard input on a server that has no idea
 what a database is yet and doesn't care.
 
-If you're just joining: this project started with a dead 2008 MMO, a client
-with no server to talk to, and nothing else, no source code, no protocol
-docs, not even a friendly ex-employee's old notes. Since then I've emailed
-the original developer for his blessing, decompiled fifteen megabytes of
-the game's own compiled script by hand, reverse-engineered a networking
-handshake from raw bytes on a wire with zero documentation, built a C#
-server from scratch that speaks that handshake well enough to fool an
-unmodified fifteen-year-old game client, and chased bugs through three
-separate wrong-bit-count errors, a backwards authority flag, a character
-falling through the literal void, and a corpse stuck refusing to leave a
-T-pose. Every single one of those was a real, specific, provable reason
-something didn't work, found by reading the actual code instead of
-guessing, because guessing is how you spend two sessions debugging a bug
-that was never there.
-
-And now there's a person standing in Fury, on my own hardware, walking
-around, for what is probably the first time since the real servers went
-dark in 2008.
-
-I'm going to go look at that gif a few more times before I do anything
-productive. Milestone 4 is done. Phase 3, "get a client to join a match and
-move," the thing this entire server rebuild has been aimed at since the
-project's very first week, is done. Next up is turning "a lone person
-standing on a platform" into an actual arena you could fight in, and
-eventually the bots, the PvE, the tutorial, all the stuff that comes after
-"does the game even work." But tonight I'm just going to watch him walk in
-a circle for a bit. He earned it. So did I.
+The server still throws those movement bunches away. There is no simulation,
+correction or database behind this person yet. But the unmodified client has
+joined a local match, instantiated the right pawn, built and animated its
+mesh, accepted WASD input and emitted real `DualServerMove` traffic while the
+body moved on screen. That is the milestone 4 test, finally returning true.
