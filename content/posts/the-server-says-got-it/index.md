@@ -92,5 +92,21 @@ clear. The same data includes its tier, icon and combat restrictions.
 The pawn also has its own network call for receiving all 24 combat slots. Slot
 one now carries that ability and the other 23 are empty. The client is meant to
 construct the ability object, load its shipped icon, then rebuild both hotbars.
-The packet is implemented and passes the server tests. The honest next line is
-still the visual check in a fresh client, so this draft stops there for now.
+The icon appeared in a fresh client, which closed that part of the job. It also
+started a useful sequence of failures. My first choice was grey because it
+consumes four charges the shortcut character does not have. The second looked
+enabled, but the weapon in the character's hands is currently appearance data,
+not an inventory item. Fury's real ability check therefore still considers the
+character unarmed.
+
+I replaced it with a shipped ability that explicitly supports that unarmed
+state and costs no energy or charges. Clicking it still did not send anything
+to the server. Pressing the physical number key did not either. That rules out
+the button itself and leaves a client-side gameplay prerequisite.
+
+The script names two required objects. A normal server creates a combat-values
+actor for the player record and a cooldown-timer actor for the pawn. The hotkey
+path refuses to continue if either reference is missing. The shortcut now
+creates and replicates both real classes, but the queue call is still absent.
+The next step is a read-only inspection of those live references. I am stopping
+at the evidence instead of inventing the cast packet that I hope comes next.
