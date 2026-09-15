@@ -56,7 +56,30 @@ floor under it.
 
 The first unattended run sat there for a full minute. The client reported the
 map coordinate plus exactly 30 units for the character's collision capsule,
-3,019 times in a row. No falling through the world. No network tantrum. I still
-need to stand at the keyboard and make sure this particular spot is actually in
-the playable arena and isn't tucked behind a decorative tomb, but at least it
-has a floor. Standards are moving quickly around here.
+3,019 times in a row. No falling through the world. No network tantrum. Then I
+stood at the keyboard and checked it properly. The character was in the
+playable arena and could walk around freely.
+
+The next job was putting an actual weapon in those empty hands. The client data
+has an equipment row for an axe and shield, an animation style for that exact
+pair, and a model row naming both meshes. I sent those values with the pawn's
+appearance data and got this:
+
+![The axe and shield loaded correctly, but Fury placed them across the character's waist and back.](axe-sheathed.png)
+
+That looked like a bad attachment transform. It was actually a good attachment
+in the wrong state. Fury has two complete sets of weapon attachment points. In
+combat it uses bones in the hands. Outside combat it stores each weapon style
+on named sockets around the body. The server shortcut had never told the pawn
+that combat had started, so the client quite reasonably sheathed everything.
+
+The transition was already in the shipped script. When the player's replicated
+combat state changes to `COMBATSTATE_COMBAT`, the pawn switches animation sets,
+detaches both weapon components, and reattaches them to the two hand bones. I
+added that one state value and ran the untouched client again.
+
+![The same shipped axe and shield correctly held after the replicated combat state moved them onto the hand bones.](axe-in-hand.png)
+
+The character is now standing in Mortem with a real Fury weapon set in hand.
+The hotbar beneath him is still empty. Filling one slot with an ability that the
+client data explicitly allows for this weapon style is next.
