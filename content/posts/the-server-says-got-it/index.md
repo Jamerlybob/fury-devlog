@@ -83,3 +83,14 @@ added that one state value and ran the untouched client again.
 The character is now standing in Mortem with a real Fury weapon set in hand.
 The hotbar beneath him is still empty. Filling one slot with an ability that the
 client data explicitly allows for this weapon style is next.
+
+That compatibility is not something I have to infer from an ability name. Each
+ability has a row of weapon style flags in the shipped client data. I picked one
+whose Axe and Shield flag is set and whose other eight style flags are all
+clear. The same data includes its tier, icon and combat restrictions.
+
+The pawn also has its own network call for receiving all 24 combat slots. Slot
+one now carries that ability and the other 23 are empty. The client is meant to
+construct the ability object, load its shipped icon, then rebuild both hotbars.
+The packet is implemented and passes the server tests. The honest next line is
+still the visual check in a fresh client, so this draft stops there for now.
