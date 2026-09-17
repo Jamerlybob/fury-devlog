@@ -110,3 +110,64 @@ path refuses to continue if either reference is missing. The shortcut now
 creates and replicates both real classes, but the queue call is still absent.
 The next step is a read-only inspection of those live references. I am stopping
 at the evidence instead of inventing the cast packet that I hope comes next.
+
+The read-only inspection found nothing wrong. Every reference the hotkey path
+checks was there, correctly typed, with values that should have let it
+through. That usually means you are looking in the wrong place, and it was.
+
+Watching the actual button press live, instead of reading the state
+afterward, showed the key press does register, but it never reaches the
+function I had been staring at. It goes through a different door entirely: a
+text command, "HotKey 1", handed to a small internal command interpreter the
+client has always had. That interpreter needs its own object, the same shape
+as the combat values and cooldown timer I had already added, and nothing had
+ever created it. I added it, and a brand new function started firing that had
+never appeared before.
+
+That function immediately gave up anyway. Its first line asks the game for
+the current score object and checks whether a match is actually running. On
+the shortcut route there was no score object to ask, for the same reason
+there had been no proper arena location back when the character was still
+stuck on the holding platform. So I added one: the specific scoring actor
+Fury's Mortem game type uses, replicated with the flag that says a match is
+underway.
+
+The next test showed the actor arriving correctly. Its phase flag decoded to
+the right value on the client. And the flag the score object is supposed to
+set on itself the moment it exists, the one everything else reads, still
+came back empty.
+
+That sent me somewhere I had been avoiding: the compiled machine code
+underneath the script, for one specific function that has no script body at
+all, because it is written in native C++. Fury's script compiler leaves the
+function's name sitting in the executable as plain text, unused, a leftover
+from how the binding used to work. Finding out what the function actually
+runs meant looking at how a much older mechanism in the engine binds a
+script function to real code in the first place, then following that all the
+way to the one line that assigns the missing flag.
+
+It turned out to be eight milliseconds. The score object announces itself
+the moment it exists, on schedule, exactly as the script says. But on this
+shortcut, a different part of the client, unrelated to that actor, finishes
+setting up its own internal bookkeeping eight milliseconds later. The
+assignment happens first, into a reference that isn't ready yet, and Fury
+does what any well behaved program does when you hand it an empty reference:
+nothing, silently, forever. I moved that one actor to the back of the list
+the server sends, giving the client's own startup a head start, and the flag
+has read correctly on every test since.
+
+Pressing the hotkey still sends nothing. But the reason has changed
+completely. Reading the actual function that key press should reach, all of
+it this time and not just its opening check, shows two entirely different
+roads leading out of it. One goes through an item check I had been chasing
+for days. The other, taken whenever the character has no real inventory
+(true here, since this character only has a visual weapon and no actual item
+behind it), goes through the ability system directly, and needs an object I
+have never given the client: something representing the current match's
+game rules. Nothing on this shortcut has ever provided one.
+
+Before adding it, I want to know whether it's actually required, or whether
+an ordinary player connecting to Fury's real servers never had one either.
+Auran's client code treats plenty of state as server only and simply does
+without it remotely. That distinction is worth getting right before writing
+more replication code to satisfy it.
