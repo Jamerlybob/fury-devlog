@@ -29,5 +29,5 @@ ShowToc: true
 <!-- Sets up the next post -->
 
 <!-- Include a picture of any concept this post leans on (a byte layout, a
-     handshake, "what X means"), not just screenshots. See DRAFTING.md.
+     handshake, "what X means"), not just screenshots.
      End with a CAPTURE note listing any screenshots/GIFs James needs to grab. -->
